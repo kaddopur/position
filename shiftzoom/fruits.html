@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="imagetoolbar" content="no" />
+	<link rel="icon" href="favicon.ico" type="image/ico" />
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+	<title>Fruits</title>
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+		 	font-family: georgia,serif;
+		 	font-style: italic; 
+			color: gray; 
+			background: white url(images/fruits/backgrnd.jpg); 
+		}	
+		b {color: orange;}
+		#container {
+			position: relative;
+			margin: 64px auto;
+			padding: 0;
+			width: 608px;
+			height: 320px;
+		 	font-family: georgia,serif;
+		 	font-style: italic; 
+			color: white; 
+			background-color: orange; 
+			border: 1px solid orange;
+			border-radius: 32px;
+			-moz-border-radius: 32px;
+			-webkit-border-radius: 32px;
+			-khtml-border-radius: 32px;
+			box-shadow: 0px 0px 8px gray; 
+			-moz-box-shadow: 0px 0px 8px gray;
+			-khtml-box-shadow: 0px 0px 8px gray;
+			-webkit-box-shadow: 0px 0px 8px gray;
+		}	
+		#wrapper {
+			position: absolute;
+			left: 32px;
+			top: 0px;
+			width:52px; 
+			width:320px; 
+			height:320px; 
+			background: white url(images/indicator.gif) 50% 50% no-repeat;
+			padding: 0;
+		}	
+		.butt {
+			position: absolute;
+			width:24px; 
+			height:24px;
+			left: 4px;
+			top: 32px;
+			margin: 0; 
+			padding: 0;
+		}	
+		.ctrl {
+			position: absolute;
+			width:24px; 
+			height:24px;
+			left: 4px;
+			bottom: 32px;
+			margin: 0; 
+			padding: 0;
+		}	
+		.item {
+			position: absolute;
+			width:32px; 
+			height:32px; 
+			margin: 0; 
+			padding: 0;
+			border: 9px solid white;
+			border-radius: 9px;
+			-moz-border-radius: 9px;
+			-webkit-border-radius: 9px;
+			-khtml-border-radius: 9px;
+		}	
+		.item:hover {
+			border: 9px solid #fffeee;
+		}	
+		.overview {
+			position: absolute;
+			width:90px; 
+			height:90px; 
+			margin: 0; 
+			padding: 0;
+			border: 9px solid white;
+			border-radius: 9px;
+			-moz-border-radius: 9px;
+			-webkit-border-radius: 9px;
+			-khtml-border-radius: 9px;
+		}	
+		.overview:hover {
+			border: 9px solid #fffede;
+		}	
+		.sign {
+			position: absolute;
+			width:224px; 
+			height:64px;
+			left: 368px; 
+			top: 248px;
+			margin: 0; 
+			padding: 0;
+		}	
+		#fruit {
+			position: absolute;
+			width:320px; 
+			height:1.5em;
+			left: 32px; 
+			bottom: 1px;
+			margin: 0; 
+			padding: 0;
+			text-align: center;
+			vertical-align: middle;
+		 	font-family: Tahoma,Helvetica,sans-serif;
+		 	font-weight: bold; 
+		 	font-style: normal; 
+			color: black;
+		}	
+	</style>
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+<script src="shiftzoom.js" language="javascript" type="text/javascript"></script>
+<script language="javascript" type="text/javascript">
+<!--
+if(typeof $=='undefined') {function $(v) {return(document.getElementById(v));}}
+if(document.images&&document.createElement&&document.getElementById){ 
+    document.writeln('<style type="text/css">'); 
+    document.writeln('img.shiftzoom { visibility: hidden; }'); 
+    document.writeln('<\/style>'); 
+} 
+function start_autoplay() {
+	$('fruit').innerHTML='playing...';
+	$('minus').style.display='none';
+	$('plus').style.display='none';
+	shiftzoom.play($('preview'),1000,true,[[100,100,33.33,3,64],[0,0,100,3,50],[33.33,33.33,100,3,50],[0,33.33,100,3,50],[66.66,0,100,3,50],[100,33.33,100,3,50],[33.33,0,100,3,50],[0,100,100,3,50],[33.33,100,100,3,50],[66.66,33.33,100,3,50],[100,0,100,3,50],[33.33,66.66,100,3,50],[0,66.66,100,3,50],[0,0,0,3,100]],'onstop_autoplay');
+}
+function onstop_autoplay() {
+	$('fruit').innerHTML='stoped!';
+	$('plus').style.display='block';
+	$('minus').style.display='block';
+	shiftzoom.set($('preview'),'nozoom',false);
+	window.setTimeout("$('fruit').innerHTML=''",500);
+}
+function on_EndAnim(str) {$('fruit').innerHTML=str;}
+function on_StartAnim()  {$('fruit').innerHTML='';}
+function on_CheckPlay()  {return shiftzoom.get($('preview'),'playing');}
+//-->
+</script>
+</head>
+<body>
+
+<div id="container">
+	<img id="plus" onclick="shiftzoom.set($('preview'),'zoomin',true);" src="images/plus_out.jpg" class="butt" width="24" height="24" alt="" border="0" onmouseover="this.src='images/plus_over.jpg';" onmouseout="this.src='images/plus_out.jpg';" title="zoom in" />
+	<img id="minus" onclick="shiftzoom.set($('preview'),'zoomout',true);" src="images/minus_out.jpg" class="butt" style="top: 60px;" width="24" height="24" alt="" border="0" onmouseover="this.src='images/minus_over.jpg';" onmouseout="this.src='images/minus_out.jpg';" title="zoom out" />
+	<img onclick="start_autoplay();" src="images/play_out.jpg" class="ctrl" style="bottom: 60px;" width="24" height="24" alt="" border="0" onmouseover="this.src='images/play_over.jpg';" onmouseout="this.src='images/play_out.jpg';" title="start autoplay" />
+	<img onclick="shiftzoom.stop($('preview'));" src="images/stop_out.jpg" class="ctrl" width="24" height="24" alt="" border="0" onmouseover="this.src='images/stop_over.jpg';" onmouseout="this.src='images/stop_out.jpg';" title="stop autoplay" />
+	<div id="wrapper">
+		<img id="preview" class="shiftzoom" onLoad="shiftzoom.add(this,{curpath:'images/cursors/', buttons:false, overview:false, lowres:'images/fruits_lowres.jpg'});" src="images/fruits.jpg" width="320" height="320" alt="preview" border="0" />
+	</div><div id="fruit"></div>
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[0,0,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/strawberry_out.jpg" class="item" style="left: 368px; top: 16px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/strawberry_over.jpg';" onmouseout="this.src='images/fruits/strawberry_out.jpg';" title="Strawberry" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[0,33.33,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/apple_out.jpg" class="item" style="left: 368px; top: 74px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/apple_over.jpg';" onmouseout="this.src='images/fruits/apple_out.jpg';" title="Apple" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[0,66.66,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/orange_out.jpg" class="item" style="left: 368px; top: 132px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/orange_over.jpg';" onmouseout="this.src='images/fruits/orange_out.jpg';" title="Orange" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[0,100,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/gooseberry_out.jpg" class="item" style="left: 368px; top: 190px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/gooseberry_over.jpg';" onmouseout="this.src='images/fruits/gooseberry_out.jpg';" title="Gooseberry" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[33.33,0,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/rockmelon_out.jpg" class="item" style="left: 426px; top: 16px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/rockmelon_over.jpg';" onmouseout="this.src='images/fruits/rockmelon_out.jpg';" title="Rockmelon" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[33.33,33.33,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/cherry_out.jpg" class="item" style="left: 426px; top: 74px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/cherry_over.jpg';" onmouseout="this.src='images/fruits/cherry_out.jpg';" title="Cherry" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[33.33,66.66,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/watermelon_out.jpg" class="item" style="left: 426px; top: 132px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/watermelon_over.jpg';" onmouseout="this.src='images/fruits/watermelon_out.jpg';" title="Watermelon" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[33.33,100,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/pineapple_out.jpg" class="item" style="left: 426px; top: 190px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/pineapple_over.jpg';" onmouseout="this.src='images/fruits/pineapple_out.jpg';" title="Pineapple" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[66.66,0,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/peach_out.jpg" class="item" style="left: 484px; top: 16px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/peach_over.jpg';" onmouseout="this.src='images/fruits/peach_out.jpg';" title="Peach" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[66.66,33.33,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/grapes_out.jpg" class="item" style="left: 484px; top: 74px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/grapes_over.jpg';" onmouseout="this.src='images/fruits/grapes_out.jpg';" title="Grapes" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[100,0,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/pear_out.jpg" class="item" style="left: 542px; top: 16px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/pear_over.jpg';" onmouseout="this.src='images/fruits/pear_out.jpg';" title="Pear" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[100,33.33,100,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/bananas_out.jpg" class="item" style="left: 542px; top: 74px;" width="32" height="32" alt="item" border="0" onmouseover="this.src='images/fruits/bananas_over.jpg';" onmouseout="this.src='images/fruits/bananas_out.jpg';" title="Bananas" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[100,100,33.33,3,false,false,'on_EndAnim',this.title]);}" src="images/fruits/fruits.jpg" class="overview" style="left: 484px; top: 132px;" width="90" height="90" alt="item" border="0" title="Fruits" />
+	<img onclick="if(!on_CheckPlay()){on_StartAnim();shiftzoom.kenburns($('preview'),[0,0,0,3]);}" src="images/fruits/sign.gif" class="sign" width="224" height="64" alt="sign" border="0" title="Overview" />
+</div>
+<p align="center">...using user commands: <b>get</b>, <b>set</b>, <b>play</b>, <b>stop</b>, and <b>kenburns</b></p>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="imagetoolbar" content="no" />
+	<link rel="icon" href="favicon.ico" type="image/ico" />
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+	<title>Caribbean</title>
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+		 	font-family: georgia,serif;
+		 	font-style: italic; 
+			color: gray; 
+			background: white;
+		}	
+		table {
+			margin: 0;
+			padding: 0;
+		 	font-family: arial,helvetica,sans-serif;
+		 	font-style: normal; 
+			color: gray; 
+		}	
+		#content { 
+			padding: 0;
+			margin-left: 48px;
+			margin-top: 24px;
+			width: 550px;
+		}
+		#header {
+		 	font-weight: normal; 
+		}
+	</style>
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+<script src="shiftzoom.js" language="javascript" type="text/javascript"></script>
+<script language="javascript" type="text/javascript">
+<!--
+if(document.images&&document.createElement&&document.getElementById){ 
+    document.writeln('<style type="text/css">'); 
+    document.writeln('img.shiftzoom { visibility: hidden; }'); 
+    document.writeln('<\/style>'); 
+} 
+shiftzoom.defaultCurpath = 'images/cursors/';
+//-->
+</script>
+</head>
+<body>
+
+<div id="content">
+<h2 id="header">Where are the Pirates of the Caribbean?</h2>
+<div style="float: left; width:315px; height:181px; border:1px solid gray; margin-right: 1em; margin-bottom: 0.25em;"> 
+<div style="width:315px; height:181px; background: url(images/indicator.gif) 50% 50% no-repeat;">
+<img id="caribbean" class="shiftzoom" onLoad="shiftzoom.add(this,{showcoords:true,relativecoords:true,zoom:100});" src="images/caribbean.jpg" width="315" height="181" alt="large image" border="0" />
+</div></div><small>
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+<tt><b>usage:</b><br />&lt;img onLoad="shiftzoom.add(this,{showcoords:true,zoom:100});" ...&gt;</tt></small><br><br>
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><img src="images/keys/left.gif" border="0" alt="left"></td>
+    <td>&nbsp;</td><td>pan <b>left</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/left.gif" border="0" alt="left"></td>
+    <td>&nbsp;</td><td>pan <b>left</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/left.gif" border="0" alt="left"></td>
+    <td>&nbsp;</td><td>pan <b>left</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/right.gif" border="0" alt="right"></td>
+    <td>&nbsp;</td><td>pan <b>right</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/right.gif" border="0" alt="right"></td>
+    <td>&nbsp;</td><td>pan <b>right</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/right.gif" border="0" alt="right"></td>
+    <td>&nbsp;</td><td>pan <b>right</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/up.gif" border="0" alt="up"></td>
+    <td>&nbsp;</td><td>pan <b>up</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/up.gif" border="0" alt="up"></td>
+    <td>&nbsp;</td><td>pan <b>up</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/up.gif" border="0" alt="up"></td>
+    <td>&nbsp;</td><td>pan <b>up</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/down.gif" border="0" alt="down"></td>
+    <td>&nbsp;</td><td>pan <b>down</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/down.gif" border="0" alt="down"></td>
+    <td>&nbsp;</td><td>pan <b>down</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/down.gif" border="0" alt="down"></td>
+    <td>&nbsp;</td><td>pan <b>down</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/plus.gif" border="0" alt="plus"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>in</b>*</td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/end.gif" border="0" alt="end"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/pgdn.gif" border="0" alt="pgdn"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/minus.gif" border="0" alt="minus"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>out</b>*</td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/home.gif" border="0" alt="home"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/pgup.gif" border="0" alt="pgup"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b></td><td>&nbsp;</td>
+  </tr>
+</table>
+<small><em>* not supported by Firefox and Opera (gecko/presto)</em></small>
+<br /><br />
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/mouse/lmouse.gif" border="0" alt="left mouse"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/wmouse.gif" border="0" title="mouse wheel down" alt="mouse wheel"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/wmouse.gif" border="0" title="middle mouse or click mouse wheel" alt="middle mouse"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>in</b>*</td><td>&nbsp;</td>
+  </tr><tr>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/mouse/lmouse.gif" border="0" alt="left mouse"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/wmouse.gif" border="0" title="mouse wheel up" alt="mouse wheel"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/rmouse.gif" border="0" title="right mouse" alt="right mouse"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>out</b>*</td><td>&nbsp;</td>
+  </tr>
+</table>
+<small><em>* must be set through preferences by Firefox and Opera (gecko/presto)</em></small>
+</div>
+
+</body>
+</html>

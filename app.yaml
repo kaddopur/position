@@ -1,8 +1,17 @@
-application: position
+application: indoorposition
 version: 1
 runtime: python
 api_version: 1
 
 handlers:
+- url: /style
+  static_dir: style
+  
+- url: /script
+  static_dir: script
+  
+- url: /image
+  static_dir: image
+
 - url: .*
   script: main.py

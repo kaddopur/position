@@ -1,0 +1,443 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>ShiftZoom.js (zoom and pan functionality)</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-language" content="en">	<link rel="bookmark" type="text/html" title="Loupe.js" href="http://www.netzgesta.de/corner/">
+	<meta name="Author" lang="en" content="corner.netzgesta.de - Christian Effenberger">	<meta name="Publisher" lang="en" content="www.netzgesta.de">	<meta name="Copyright" lang="en" content="www.netzgesta.de - Christian Effenberger">	<meta name="Generator" lang="en" content="Christian Effenberger">
+	<meta name="Description" lang="en" content="ShiftZoom.js 3.8 allows you to add zoom and pan functionality to oversized images on your webpages through unobtrusive javascript">
+	<meta name="Keywords" lang="en" content="ShiftZoom.js,images,canvas,javascript,zoom,pan,move,magnifier,Internet Explorer,Mozilla,Firefox,Opera,Safari">
+	<meta http-equiv="imagetoolbar" content="no">
+<style type="text/css">
+a { color: blue; font-style:italic; text-decoration:none; }
+tt {color: green;}
+b {color: darkred;}
+body { background: url(images/backgrnd.jpg) silver; color: black; font-family: Georgia,serif; line-height: 1.5; margin: 0.5em 1em;}
+h2 { font-family: Verdana,Arial,Helvetica,sans-serif; }
+.tab { border: 1px solid gray; background: white; padding: 0.25em; } 
+#guru { padding: 4px; width: 99%; height: auto; text-align: center; background-color: black; }
+#guru div { border: solid 3px red; padding: 4px; font-family: monospace; font-size: 1.25em; width: auto; height: auto; color: red; text-align: center; text-decoration: blink; }
+#header { margin-bottom: 0; font-weight: normal; font-style: italic; color: gray; }
+.bookmarks { white-space: nowrap; width: 98%; margin: 0; padding-top: 10px; border-top: 1px dotted gray;}
+</style>
+</head>
+<body><noscript><div id="guru" title="By this you can recognize the Amiga fan!"><div><strong>Guru Meditation</strong> - With deactivated JavaScript: Images stay unmodified!</div></div></noscript>
+<table>
+<tr><td valign="top"><a href="loupe.zip" title="download loupe.js"><img src="images/logo.jpg" border="0" width="352" height="160" alt="loupe.js" style="float:left; padding-right: 15px;"></a></td>
+<td style="line-height: 1.5; font-style: italic;"><strong>ShiftZoom.js</strong> 3.8 allows you to add zoom and pan functionality to oversized images on your webpages. It uses unobtrusive javascript to keep your code clean.
+<p>It works in all the major browsers - Mozilla, Firefox, Opera, Safari, Chrome, iPhone, iPad, iPod and IE 5+. Works also on older browsers supporting images/ createElement/ getElementById, else it'll degrade and your visitors won't notice a thing.</p>
+</td></tr>
+</table>
+
+<h2>Setting Up</h2>
+
+<p>Download "shiftzoom.js" and include it into your webpages HEAD section.</p>
+
+<code>
+&lt;script type="text/javascript" src="<tt>shiftzoom.js</tt>"&gt;&lt;/script&gt;<br>
+<br>// only if the cursor images for IE are not in the current path
+<br>&lt;scriptscript type="text/javascript"&gt;
+<br>&nbsp;&nbsp;<tt>shiftzoom.defaultCurpath</tt>='images/cursors/';
+<br>&lt;/script&gt;
+</code>
+
+<h2>Using It</h2>
+
+<p>To add shiftzoom just set the event onload="<tt>shiftzoom.add(this);</tt>" to a div surrounded image.</p>
+<code>
+&lt;div&gt;<br>
+&lt;img onLoad="<tt>shiftzoom.add(this);</tt>" width="356" height="205" ...&gt;<br>
+&lt;/div&gt;
+</code>
+Mouse- and Keyboard-driven handling:
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/mouse/lmouse.gif" border="0" alt="left mouse"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/wmouse.gif" border="0" title="mouse wheel down" alt="mouse wheel"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/wmouse.gif" border="0" title="middle mouse or click mouse wheel" alt="middle mouse"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>in</b>*</td><td>&nbsp;</td>
+  </tr><tr>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/mouse/lmouse.gif" border="0" alt="left mouse"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/wmouse.gif" border="0" title="mouse wheel up" alt="mouse wheel"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/mouse/rmouse.gif" border="0" title="right mouse" alt="right mouse"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>out</b>*</td><td>&nbsp;</td>
+  </tr>
+</table>
+<small><em>* must be set through preferences by Firefox and Opera (gecko/presto)</em></small>
+<p></p>
+Keyboard-driven handling: <em>(if focused through mouse over image)</em>
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><img src="images/keys/left.gif" border="0" alt="left"></td>
+    <td>&nbsp;</td><td>pan <b>left</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/left.gif" border="0" alt="left"></td>
+    <td>&nbsp;</td><td>pan <b>left</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/left.gif" border="0" alt="left"></td>
+    <td>&nbsp;</td><td>pan <b>left</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/right.gif" border="0" alt="right"></td>
+    <td>&nbsp;</td><td>pan <b>right</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/right.gif" border="0" alt="right"></td>
+    <td>&nbsp;</td><td>pan <b>right</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/right.gif" border="0" alt="right"></td>
+    <td>&nbsp;</td><td>pan <b>right</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/up.gif" border="0" alt="up"></td>
+    <td>&nbsp;</td><td>pan <b>up</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/up.gif" border="0" alt="up"></td>
+    <td>&nbsp;</td><td>pan <b>up</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/up.gif" border="0" alt="up"></td>
+    <td>&nbsp;</td><td>pan <b>up</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/down.gif" border="0" alt="down"></td>
+    <td>&nbsp;</td><td>pan <b>down</b></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/shift.gif" border="0" alt="shift"><img src="images/keys/down.gif" border="0" alt="down"></td>
+    <td>&nbsp;</td><td>pan <b>down</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td><img src="images/keys/alt.gif" border="0" alt="alt"><img src="images/keys/down.gif" border="0" alt="down"></td>
+    <td>&nbsp;</td><td>pan <b>down</b> <em>(slow)</em></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/plus.gif" border="0" alt="plus"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>in</b>*</td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/end.gif" border="0" alt="end"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/pgdn.gif" border="0" alt="pgdn"></td>
+    <td>&nbsp;</td><td>zoom <b>in</b></td><td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><img src="images/keys/minus.gif" border="0" alt="minus"></td>
+    <td bgcolor="#FFCCCC">&nbsp;</td><td bgcolor="#FFCCCC">zoom <b>out</b>*</td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/home.gif" border="0" alt="home"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b> <em>(fast)</em></td><td>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><img src="images/keys/pgup.gif" border="0" alt="pgup"></td>
+    <td>&nbsp;</td><td>zoom <b>out</b></td><td>&nbsp;</td>
+  </tr>
+</table>
+<small><em>* not supported by Firefox and Opera (gecko/presto)</em></small>
+<p></p>
+Stick/Finger-driven handling:  <em>(touch events)</em><ul>
+<li>pan <b>all directions</b> by single tap, hold and drag</li>
+<li>zoom <b>in and out</b> by pinch gesture <em>(currently iOS only)</em></li>
+<li>zoom <b>full in and full out</b> by double tap</li>
+</ul>
+
+
+<h2>Usage</h2>
+
+<dl>
+	<dt>Set defaults</dt>
+  	<dd>
+		<code>shiftzoom.<b>defaultFading</b> &nbsp; &nbsp; = <tt>true</tt>; //BOOLEAN startup image fading</code><br/>
+		<code>shiftzoom.<b>defaultButtons</b> &nbsp;&nbsp; = <tt>true</tt>; //BOOLEAN left top buttons</code><br />
+		<code>shiftzoom.<b>defaultNozoom</b> &nbsp; &nbsp; = <tt>false</tt>; //BOOLEAN disable zooming feature</code><br />
+		<code>shiftzoom.<b>defaultBicubic</b> &nbsp;&nbsp; = <tt>false</tt>; //BOOLEAN enable bicubic image interpolation for IE7+</code><br />
+		<code>shiftzoom.<b>defaultWheelinvert</b>= <tt>false</tt>; //BOOLEAN makes zoom behaviour identical with Google Maps
+		<code>shiftzoom.<b>defaultWheelstep</b> &nbsp;= <tt>20</tt>; //INT/FLOAT 0-100 (%) wheel step size percentage
+		<code>shiftzoom.<b>defaultZoom</b> &nbsp; &nbsp; &nbsp; = <tt>0</tt>; //INT/FLOAT 0-100 (%) zooming percentage</code><br />
+		<code>shiftzoom.<b>defaultXpos</b> &nbsp; &nbsp; &nbsp; = <tt>50</tt>; //INT/FLOAT 0-100 (%) horizontal position</code><br />
+		<code>shiftzoom.<b>defaultYpos</b> &nbsp; &nbsp; &nbsp; = <tt>50</tt>; //INT/FLOAT 0-100 (%) vertical position</code><br />
+		<code>shiftzoom.<b>defaultOpacity</b> &nbsp;&nbsp; = <tt>70</tt>; //INT 0-100 (%) zoom button opacity</code><br/>
+		<code>shiftzoom.<b>defaultMillisec</b> &nbsp; = <tt>30</tt>; //INT 5-100 zoom interval delay</code><br/>
+		<code>shiftzoom.<b>defaultIntitle</b> &nbsp;&nbsp; = <tt>'zoom in'</tt>; //STR zoom in button title text</code><br/>
+		<code>shiftzoom.<b>defaultOuttitle</b> &nbsp; = <tt>'zoom out'</tt>; //STR zoom out button title text</code><br/>
+		<code>shiftzoom.<b>defaultInfoblock</b>&nbsp; = <tt>'&lt;dl&gt;...&lt;\/dl&gt;'</tt>; //STR Info/Help block content</code><br />
+		<code>shiftzoom.<b>defaultCurpath</b> &nbsp;&nbsp; = <tt>''</tt>; //STR cursor path (*.cur) IE only</code><br/>
+		<code>shiftzoom.<b>defaultLowres</b> &nbsp; &nbsp; = <tt>''</tt>; //STR lowres image (dimension equals elements width and height)</code><br />
+		<code>shiftzoom.<b>defaultIcons</b> &nbsp; &nbsp;&nbsp; = <tt>null</tt>; //OBJ icon array (see shiftzoom.construct)</code><br />
+		<code>shiftzoom.<b>defaultShowcoords</b> = <tt>false</tt>; //BOOLEAN show coordinates</code><br/>
+		<code>shiftzoom.<b>defaultRelativecoords</b> = <tt>false</tt>; //BOOLEAN relative instead of absolute pixel coordinates</code><br/>
+		<code>shiftzoom.<b>defaultPixelcoords</b>= <tt>true</tt>; //BOOLEAN show Pixel coords instead of Lat/Lon</code><br/>
+		<code>shiftzoom.<b>defaultPercentcoords</b>=<tt>false</tt>; //BOOLEAN show percentage instead of Lat/Lon/Pixel coordinates</code><br/>
+		<code>shiftzoom.<b>defaultForcetouchui</b>=<tt>false</tt>; //BOOLEAN forces touch UI over the mouse UI if both available</code><br/>
+		<code>shiftzoom.<b>defaultOverview</b> &nbsp; = <tt>false</tt>; //BOOLEAN show overview</code><br/>
+		<code>shiftzoom.<b>defaultOvsfact</b> &nbsp;&nbsp; = <tt>25</tt>; //INT 10-50 (%) overview size factor</code><br/>
+		<code>shiftzoom.<b>defaultOvaopac</b> &nbsp;&nbsp; = <tt>75</tt>; //INT 0-100 (%) overview area opacity</code><br/>
+		<code>shiftzoom.<b>defaultOvacolor</b> &nbsp; = <tt>'red'</tt>;	//STR overview area css color</code><br/>
+		<code>shiftzoom.<b>defaultOvbcolor</b> &nbsp; = <tt>'white'</tt>; //STR overview border css color</code><br/>
+		<code>shiftzoom.<b>defaultOvborder</b> &nbsp; = <tt>''</tt>; //INT 0-20 (px) or "" overview border width</code><br/>
+  		<p></p>
+	</dd>
+	<dt>Add functionality to image</dt>
+  	<dd>
+  		<code>shiftzoom.add(<tt>image</tt>[, <tt>options</tt>]);</code><br/>
+		<dl><dt><code><tt>image</tt>&nbsp; == div surrounded image</code></dt></dl>
+		<dl><dt><code><tt>options</tt> &nbsp; &nbsp; &nbsp; &nbsp; e.g. {<b>overview</b>: <tt>true</tt>, <b>opacity</b>: <tt>32</tt>, ...}</code></dt>
+		<dd>
+			<code><b>fading</b> &nbsp; &nbsp; == BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>true</tt></code><br/>			<code><b>buttons</b> &nbsp;&nbsp; == BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>true</tt></code><br />
+			<code><b>nozoom</b> &nbsp; &nbsp; == BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br />
+			<code><b>bicubic</b> &nbsp;&nbsp; == BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br />
+			<code><b>wheelinvert</b>== BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br />
+			<code><b>wheelstep</b> &nbsp;== INT/FLOAT <tt>0</tt> - <tt>100</tt> Default: <tt>20</tt></code><br />
+			<code><b>zoom</b> &nbsp; &nbsp; &nbsp; == INT/FLOAT <tt>0</tt> - <tt>100</tt> Default: <tt>0</tt></code><br />
+			<code><b>xpos</b> &nbsp; &nbsp; &nbsp; == INT/FLOAT <tt>0</tt> - <tt>100</tt> Default: <tt>50</tt></code><br />
+			<code><b>ypos</b> &nbsp; &nbsp; &nbsp; == INT/FLOAT <tt>0</tt> - <tt>100</tt> Default: <tt>50</tt></code><br />
+			<code><b>opacity</b> &nbsp;&nbsp; == INT <tt>0</tt> - <tt>100</tt> Default: <tt>90</tt></code><br/>			<code><b>millisec</b> &nbsp; == INT <tt>5</tt> - <tt>100</tt> Default: <tt>40</tt></code><br/>
+			<code><b>intitle</b> &nbsp;&nbsp; == STRING Default: <tt>'click or press shift key to zoom in'</tt></code><br/>
+			<code><b>outtitle</b> &nbsp; == STRING Default: <tt>'click or press alt key to zoom out'</tt></code><br/>
+			<code><b>infoblock</b>&nbsp; == STRING Default: <tt>'&lt;dl&gt;...&lt;\/dl&gt;'</tt></code><br />
+			<code><b>curpath</b> &nbsp;&nbsp; == STRING Default: <tt>''</tt></code><br/>
+			<code><b>lowres</b> &nbsp; &nbsp; == STRING Default: <tt>''</tt> (faster zooming)</code><br />
+			<code><b>icons</b> &nbsp; &nbsp;&nbsp; == OBJECT Default: <tt>null</tt> (icon array)</code><br />
+			<code><b>showcoords</b> == BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br/>
+			<code><b>relativecoords</b> == BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br/>
+			<code><b>pixelcoords</b>== BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>true</tt></code><br/>
+			<code><b>percentcoords</b>==BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br/>
+			<code><b>forcetouchui</b>==BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br/>
+			<code><b>overview</b> &nbsp; == BOOLEAN <tt>true</tt> or <tt>false</tt> Default: <tt>true</tt></code><br/>
+			<code><b>ovsfact</b> &nbsp;&nbsp; == INT <tt>10</tt> - <tt>50</tt> Default: <tt>25</tt></code><br/>
+			<code><b>ovaopac</b> &nbsp;&nbsp; == INT <tt>0</tt> - <tt>100</tt> Default: <tt>75</tt></code><br/>
+			<code><b>ovacolor</b> &nbsp; == STRING <tt>'#ffaa00'</tt> or <tt>'orange'</tt> Default: <tt>'red'</tt></code><br/>
+			<code><b>ovbcolor</b> &nbsp; == STRING <tt>'#0000ff'</tt> or <tt>'blue'</tt> Default: <tt>'white'</tt></code><br/>
+			<code><b>ovborder</b> &nbsp; == INT <tt>0</tt> - <tt>20</tt> Default: <tt>automatic</tt></code>
+  		</dd></dl>
+  		<p></p>
+  	</dd>
+	<dt>Get some informations</dt>
+	<dd>
+		<code><tt>FLOAT</tt>|<tt>INT</tt> = shiftzoom.get(<tt>image</tt>, ['<b>maxzoomx</b>'|'<b>maxzoomy</b>'|'<b>maxwidth</b>'|'<b>maxheight</b>']);</code><br />
+		<code><tt>BOOLEAN</tt> = shiftzoom.get(<tt>image</tt>,'<b>playing</b>');</code><br />
+		<code><tt>OBJECT</tt> = shiftzoom.get(<tt>image</tt>,'<b>currentxyz</b>');</code><br />
+		<em>(<small>returns current</small> <code><tt>x</tt>=<b>xpos</b>, <tt>y</tt>=<b>ypos</b> and <tt>z</tt>=<b>zoom</b></code> <small> values as INT/FLOAT 0-100 (%)</small>)</em><br />
+		<code><tt>FLOAT</tt> = shiftzoom.version;</code><br />
+		<code><tt>STRING</tt> = shiftzoom.released;</code>
+  		<p></p>
+	</dd>
+	<dt>Modify some defaults</dt>
+	<dd>
+		<code>shiftzoom.set(<tt>image</tt>, ['<b>buttons</b>'|'<b>overview</b>'|'<b>showcoords</b>'|'<b>relativecoords</b>'|'<b>pixelcoords</b>'|'<b>zoomin</b>'|'<b>zoomout</b>'|'<b>nozoom</b>'], [<tt>true</tt>|<tt>false</tt>]);</code><br />
+		<em>(<small>The external zoom button control</small> <code><b>zoomin</b>|<b>zoomout</b></code> <small>depends on the settings</small> <code><b>buttons</b>=<tt>false</tt></code> <small>and</small> <code><b>nozoom</b>=<tt>false</tt></code>)</em>
+  		<p></p>
+	</dd>
+	<dt>Modify current infoblock</dt>
+	<dd>
+		<code>shiftzoom.info(<tt>image</tt>, <b>value</b>);</code><br />
+		<code><b>value</b> == <tt>innerHTML-block</tt> (e.g. '<b>&lt;dl&gt;...&lt;\/dl&gt;</b>')</code><br />
+  		<p></p>
+	</dd>
+	<dt>Modify current source image</dt>
+	<dd>
+		<code>shiftzoom.source(<tt>image</tt>, <b>value</b>, <b>boolean</b>);</code><br />
+		<code><b>value</b> == <tt>URI</tt> (e.g. '<b>images/world.jpg</b>')<br />
+		<b>boolean</b> == fade out/in (<tt>true</tt> or <tt>false</tt>)</code>
+  		<p></p>
+	</dd>
+	<dt>Modify current lowres source image</dt>
+	<dd>
+		<code>shiftzoom.lowsource(<tt>image</tt>, <b>value</b>);</code><br />
+		<code><b>value</b> == <tt>URI</tt> (e.g. '<b>images/world_lowres.jpg</b>')</code>
+  		<p></p>
+	</dd>
+	<dt>Modify current zooming</dt>
+	<dd>
+		<code>shiftzoom.zooming(<tt>image</tt>, <b>value</b>);</code><br />
+		<code><b>value</b> == <tt>0</tt> - <tt>100</tt> (%) default: <tt>0</tt></code>
+  		<p></p>
+	</dd>
+	<dt>Modify current position</dt>
+	<dd>
+		<code>shiftzoom.moveto(<tt>image</tt>, <b>x</b>, <b>y</b>);</code>
+		<dl><dt><code><b>x</b>,<b>y</b> defaults to <tt>0</tt>,<tt>0</tt></code></dt><dd>
+			<code>if <b>x</b> or <b>y</b> == INT e.g. <tt>189</tt><br/>
+then <tt>it's interpreted as</tt> pixel <tt>from within natural image dimension</tt></code><br/>			<code>if <b>x</b> or <b>y</b> == STR e.g. <tt>'50%'</tt> Pattern: <b>(</b>INT<b>|</b>FLOAT<b>)%</b><br/> 
+then <tt>it's interpreted as</tt> percentage</code><br/>			<code>if <b>x</b> or <b>y</b> == STR e.g. <tt>'-23.057'</tt> Pattern: <b>(</b>+<b>|</b>-<b>)(</b>INT<b>|</b>FLOAT<b>)</b><br/> 
+then <tt>it's interpreted as</tt> longitude <tt>or</tt> latitude</code><br/>
+  		</dd></dl>
+  		<p></p>
+	</dd>
+	<dt>Modify current position and zoom (animated)</dt>
+	<dd>
+		<code>shiftzoom.kenburns(<tt>image</tt>, [<b>x</b>, <b>y</b>, <b>z</b>, <b>s</b>, <b>d</b>, <b>c</b>, <b>a</b>]);</code><br />
+		<code><b>x</b> == left position <tt>0</tt> - <tt>100</tt> (%) default: <tt>50</tt></code><br />
+		<code><b>y</b> == top position <tt>0</tt> - <tt>100</tt> (%) default: <tt>50</tt></code><br />
+		<code><b>z</b> == zomm factor <tt>0</tt> - <tt>100</tt> (%) default: <tt>50</tt></code><br />
+		<code><b>e</b> == optional progression <tt>0.0</tt> - <tt>2.0</tt> | <tt>3</tt> default: <tt>1</tt></code><br />
+		<code> &nbsp; &nbsp; [< 1 == <tt>ease-out</tt> | 1 == <tt>linear</tt> | > 1 == <tt>ease-in</tt> | 3 == <tt>ease-in-out</tt>]</code><br />
+		<code><b>s</b> == optional animation steps <tt>10</tt> - <tt>100</tt> default: <tt>max distance/interval delay</tt></code><br />
+		<code><b>d</b> == optional interval delay <tt>10</tt> - <tt>100</tt> default: <tt>30</tt></code><br />
+		<code><b>c</b> == optional callback function name (executes on end of animation) default: <tt>''</tt></code><br />
+		<code><b>a</b> == optional callback argument (string or number only) default: <tt>''</tt></code><br />
+		<em>(<small>To use callback and default values for</small> <code> <b>e</b>, <b>s</b>, <b>d</b> </code> <small>set them to</small> <code><tt>false</tt></code>)</em>
+  		<p></p>
+	</dd>
+	<dt>Start playing</dt>
+	<dd>
+		<code>shiftzoom.play(<tt>image</tt>, <b>delay</b>, <b>loop</b>, <b>array</b>, <b>callback</b>);</code><br />
+		<code><b>delay</b> &nbsp;&nbsp; == delay between play positions <tt>0</tt> - <tt>100000</tt> millisec. default: <tt>0</tt></code><br />
+		<code><b>loop</b> &nbsp; &nbsp; == loop array <tt>true</tt> or <tt>false</tt> default: <tt>false</tt></code><br />
+		<code><b>array</b> &nbsp;&nbsp; == two dimensional array with syntax from kenburns <tt>[[x,y,z], [x,y,z,e], [x,y,z,e,s], [x,y,z,e,s,d]...]</tt></code><br />
+		<code><b>callback</b> == optional function name (executes on stop playing)</code><br />
+		<em>(<small>Start playing will set</small> <code> <b>buttons</b>, <b>showcoords</b>, <b>overview</b> </code> <small>to</small> <code><tt>false</tt> </code> <small>and</small> <code><b>nozoom</b> </code> <small>to</small> <code><tt>true</tt></code>)</em>
+  		<p></p>
+	</dd>
+	<dt>Stop playing</dt>
+	<dd>
+		<code>shiftzoom.stop(<tt>image</tt>);</code><br />
+		<em>(<small>Stop playing is also executed on user action through mouse or keyboard</small>)</em>
+  		<p></p>
+	</dd>	
+	<dt>Add icon(s) to image</dt>
+	<dd>
+		<code>shiftzoom.construct(<tt>image</tt>, <b>object</b>);</code><br />
+		<dl><dt><code><tt>object</tt> &nbsp; &nbsp; &nbsp; &nbsp; e.g. [{<b>x</b>: <tt>52</tt>, <b>y</b>: <tt>31</tt>, ...},{...}]</code></dt>
+		<dd>
+			<code><b>x</b> &nbsp;&nbsp; &nbsp; == x position relative to images natural width <tt>0</tt> - <tt>n</tt> (px) Default: <tt>0</tt></code><br />
+			<code><b>y</b> &nbsp;&nbsp; &nbsp; == y position relative to images natural height <tt>0</tt> - <tt>n</tt> (px) Default: <tt>0</tt></code><br />
+			<code><b>w</b> &nbsp;&nbsp; &nbsp; == icon width <tt>8</tt> - <tt>n</tt> (px) Default: <tt>0</tt></code><br />
+			<code><b>h</b> &nbsp;&nbsp; &nbsp; == icon height <tt>8</tt> - <tt>n</tt> (px) Default: <tt>0</tt></code><br />
+			<code><b>src</b> &nbsp;&nbsp; == icon #1 image URL Default: <tt>''</tt></code><br />
+			<code><b>src2</b> &nbsp; == optional icon #2 image URL Default: <tt>''</tt></code><br />
+			<code><b>pos</b> &nbsp;&nbsp; == optional icon position <tt>0</tt> - <tt>9</tt> Default: <tt>0</tt> <small>(<tt>1</tt>=left-top, <tt>2</tt>=center-top, <tt>3</tt>=right-top, <tt>4</tt>=center-left, <tt>0</tt>/<tt>5</tt>=center-center, <tt>6</tt>=center-right, <tt>7</tt>=left-bottom, <tt>8</tt>=center-bottom, <tt>9</tt>=right-bottom)</small></code><br />
+			<code><b>id</b> &nbsp;&nbsp;&nbsp; == optional icon id Default: <tt>''</tt></code><br />
+			<code><b>title</b>&nbsp; == optional icon tooltip text Default: <tt>''</tt></code><br />
+			<code><b>href</b> &nbsp; == optional icon link URL Default: <tt>''</tt></code><br />			<code><b>target</b> == optional icon link target Default: <tt>''</tt></code>
+  		</dd></dl>
+  		<p></p>
+  	</dd>
+	<dt>Remove icon(s) from image</dt>
+	<dd>
+		<code>shiftzoom.destruct(<tt>image</tt>, <b>value</b>);</code><br />
+		<code><b>value</b> == <tt>STRING</tt> (remove named icon)</code><br />
+		<code><b>value</b> == <tt>BOOLEAN</tt> (remove all icons)</code>
+  		<p></p>
+	</dd>
+	<dt>Remove functionality from image</dt>
+	<dd>
+		<code>shiftzoom.remove(<tt>image</tt>, <b>value</b>);</code><br />
+		<code><b>value</b> == <tt>BOOLEAN</tt> (reset image to natural dimension)</code>
+  		<p></p>
+	</dd>
+	<dt>Examples</dt>
+	<dd>
+  		<code>&lt;img onLoad="shiftzoom.add(<tt>this</tt>);" ...&gt;</code><br/>
+  		<code>shiftzoom.add(<tt>document.getElementById('img')</tt>);</code><br/>
+		<code>if(typeof $=='undefined') {function $(v) {return(document.getElementById(v));}}</code><br/>
+  		<code>shiftzoom.add(<tt>$('img')</tt>);</code><br/>
+  		<code>shiftzoom.add(<tt>$('img')</tt>, {<b>fading</b>:<tt>false</tt>, <b>curpath</b>:<tt>'cursors/'</tt>});</code><br/>
+  		<code>alert(shiftzoom.get(<tt>$('img')</tt>,'<b>maxwidth</b>'));</code><br/>
+  		<code>alert(shiftzoom.version);</code><br/>
+  		<code>shiftzoom.set(<tt>$('img')</tt>,'<b>overview</b>',<tt>false</tt>);</code><br/>
+		<code>&lt;button type="button" onclick="shiftzoom.set(<tt>$('img')</tt>,'<b>zoomin</b>',<tt>true</tt>);"&gt; + &lt;/button&gt;</code><br />
+		<code>&lt;button type="button" onclick="shiftzoom.set(<tt>$('img')</tt>,'<b>zoomout</b>',<tt>true</tt>);"&gt; - &lt;/button&gt;</code><br />
+  		<code>shiftzoom.info(<tt>$('img')</tt>,'<b>&lt;p&gt;eat my shorts&lt;\/p&gt;</b>');</code><br />
+  		<code>shiftzoom.source(<tt>$('img')</tt>,'<b>images/world.jpg</b>',<tt>false</tt>);</code><br />
+  		<code>shiftzoom.lowsource(<tt>$('img')</tt>,'<b>images/world_lowres.jpg</b>');</code><br />
+  		<code>shiftzoom.zooming(<tt>$('img')</tt>,<b>100</b>);</code><br/>
+  		<code>shiftzoom.moveto(<tt>$('img')</tt>,<b>'50%'</b>,<b>'50%'</b>);</code><br/>
+  		<code>shiftzoom.kenburns(<tt>$('img')</tt>,[<b>25</b>,<b>75</b>,<b>100</b>]);</code><br />
+  		<code>shiftzoom.play(<tt>$('img'),<b>0</b>,<b>true</b>,[[<b>25</b>,<b>75</b>,<b>100</b>],[<b>0</b>,<b>0</b>,<b>0</b>]])</tt>);</code><br />
+  		<code>shiftzoom.stop(<tt>$('img')</tt>);</code><br />
+  		<code>shiftzoom.construct(<tt>$('img')</tt>,[{x:<b>250</b>,y:<b>75</b>,w:<b>48</b>,h:<b>48</b>,src:'<b>icon.png</b>',id:'<b>ico</b>'}]);</code><br />
+  		<code>shiftzoom.destruct(<tt>$('img')</tt>,'<b>ico</b>');</code><br />
+  		<code>shiftzoom.remove(<tt>$('img')</tt>);</code><br />
+  		<p></p>
+	</dd>
+</dl>
+
+<h2>Demonstration</h2>
+
+<p>Shows what "shiftzoom.js" does.</p>
+<div style="margin-left: 2em; width: 100%">
+<a class="tab" target="examples" href="caribbean.html">Caribbean <b>(simple)</b></a>
+<a class="tab" target="examples" href="fruits.html">Fruits <b>(ken burns)</b></a>
+<a class="tab" target="examples" href="world.html">World <b>(icons)</b></a>
+<a class="tab" target="examples" href="mosaic.html">Mosaic <b>(multiple)</b></a>
+</div>
+<iframe style="border: 1px solid gray; margin-left: 2em;" src="caribbean.html" width="640" height="600" name="examples">
+<p>Your Browser is unable to show embedded frames:</p>
+<ul>
+  	<li><a href="caribbean.html">Caribbean</a> (simple)</li>
+  	<li><a href="fruits.html">Fruits</a> (ken burns)</li>
+  	<li><a href="world.html">World</a> (icons)</li>
+  	<li><a href="mosaic.html">Mosaic</a> (multiple)</li>
+</ul>
+</iframe>
+
+<h2>Why use Javascript ShiftZoom?</h2>
+
+<ul>
+<li>Fast and easy to implement. Just add onload="shiftzoom.add(this);" to the image.</li>
+<li>Works even well with 10 Megapixel images (use lowres argument to speed up zooming). </li>
+<li>Makes large images completely visibly through small page-areas.</li>
+<li>Supports an extensive mouse and keyboard control for pan and zoom.</li>
+<li>Allows to build interactive applications (e.g. construct|destruct).</li>
+<li>Works and looks really well. Doesn't require additional resources.</li>
+<li>Free of charge use on non-commercial and private web sites.</li>
+</ul>
+
+<p>In very old browsers, the script degrades and your visitors won't notice a thing.</p>
+
+<h2>Restrictions</h2>
+
+<p>Element dimensions should always respect the Aspect Ratio of the image.</p>
+<p>iOS (iPod/iPad/iPhone) Resource Limits (Quote):<br/>
+"JPEG images can be up to 32 megapixels due to subsampling, which allows JPEG images to decode to a size that has one sixteenth the number of pixels. JPEG images larger than 2 megapixels are subsampled—that is, decoded to a reduced size. JPEG subsampling allows the user to view images from the latest digital cameras."</p>
+<p>Android zooming (pinch gesture). Currently not, because android emulator do not support multiple finger gestures!</p>
+<p>Internet Explorer's image scaling through bicubic interpolation is only 
+available in version 7 and up. So don't expect to much (smooth display) 
+from older browsers like IE 5, IE 5.5, and IE 6. IE needs external cursor images (*.cur).</p>
+<p>Operas cursor handling sucks. Opera and Safari 1-2 are unable to interpret style sheet percentages properly and exactly.</p>
+<p>Handling javascript mouse events is not a simple thing, because there  
+are inconsistancies in the way different browsers implement mouse events.
+That's the reason why the response on right mouse button is inconsistent 
+in shiftzoom. The differences in detail:</p>
+<ul>
+<li>Firefox: Works as expected</li>
+<li>Opera: It's impossible to prevent the context menu from showing up</li>
+<li>Safari: Won't fire the onmouseup event (instead oncontextmenu)</li>
+<li>IE: Currently only tested with Apples Mighty Mouse (emulated PC)</li>
+</ul>
+
+<h2>History</h2>
+
+Version 3.8<ul><li>Added support for inverted wheel behaviour</li><li>Added support for wheel step size as percentage</li></ul>
+Version 3.7<ul><li>Added support for zooming in by double click</li><li>Extended World example with navi gadgets</li></ul>
+Version 3.6<ul><li>Added support to force the touch UI over the mouse UI</li></ul>
+Version 3.5<ul><li>Added support for ontouch/ongesture events</li></ul>
+Version 3.4<ul><li>Added support for Internet Explorer 9</li></ul>
+Version 3.3<ul><li>Added support for absolute and relative pixel coordinates</li></ul>
+Version 3.2<ul><li>Added a tooltip library</li></ul>
+Version 3.1<ul><li>Changed the user commands kenburns and play to be consistent</li></ul>
+Version 3.05<ul><li>Changed the panning to be consistent (independent of using px, % or Latitude-Longitude).</li></ul>
+Version 3.0<ul><li>Totally reworked to support overlayed and autoscaled (interactive) icons</li><li>Added default [icons] and user commands [contruct|destruct]</li><li>Added default [bicubic] for IE7/8 image interpolation mode</li></ul>
+Version 2.66<ul><li>Added support for resetting the image to natural dimension during remove</li></ul>
+Version 2.64<ul><li>Bugfixes</li></ul>
+Version 2.62<ul><li>Added bicubic interpolation support for IE &gt; 6</li><li>Added user command lowsource</li></ul>
+Version 2.6<ul><li>Added support for lowres image (generally)</li><li>Extended user command get (currentxyz)</li><li>Added support for showing coordinates as percentage</li></ul>
+Version 2.5<ul><li>Added support for lowres image (for faster zooming with kenburns)</li><li>Extended user commands kenburns and play with optional callback function</li></ul>
+Version 2.4<ul><li>Added user commands play and stop</li><li>Extended user command kenburns</li></ul>
+Version 2.3<ul><li>Added external zoom button control via user command set (zoomin|zoomout)</li></ul>
+Version 2.2<ul><li>Added user command kenburns</li><li>Added released query</li></ul>
+Version 2.1<ul><li>Added default infoblock</li><li>Added version query</li></ul>
+Version 2.0<ul><li>Added default nozoom</li><li>Added auto focus</li></ul>
+Version 1.9<ul><li>Added user command source</li></ul>
+Version 1.8<ul><li>Added default buttons</li></ul>
+Version 1.7<ul><li>Added default xpos, ypos and zoom</li><li>Added user commands get and zooming</li></ul>
+Version 1.6<ul><li>Added user commands set and moveto</li></ul>
+Version 1.5<ul><li>Added mouse support for wheel and middle/right button</li><li>Added tooltip help (keyboard support)</li></ul>
+Version 1.4<ul><li>Added support for showing coordinates</li></ul>
+Version 1.3<ul><li>Added keyboard support for pan and zoom</li></ul>
+Version 1.2<ul><li>Added fading zoom factor info</li></ul>
+Version 1.1<ul><li>Added navigation by dragging the rectangle of the overview</li></ul>
+Version 1.0<ul><li>Initial Release</li></ul>
+
+<h2>License</h2>
+
+<p>ShiftZoom.js is distributed under this <a href="LICENSE.txt">LICENSE</a>. License permits free of charge use on non-commercial and private web sites only under special conditions <em>(as described in the license)</em>. This license equals neither "<span style="text-decoration: line-through;">open source</span>" nor "<span style="text-decoration: line-through;">public domain</span>". There are also <a href="&#109;&#097;&#105;&#108;&#116;&#111;:&#099;&#118;&#105;&#064;&#110;&#101;&#116;&#122;&#103;&#101;&#115;&#116;&#097;&#046;&#100;&#101;">Commercial Software Licenses</a> available.</p>
+
+<h6>YOU AGREE TO ALL CONDITIONS OF THIS LICENCE AGREEMENT CONCERNING THE USE OF THE SOFTWARE BY ACCEPTING THIS LICENCE.
+<br>IF YOU DO NOT AGREE TO ALL CONDITIONS OF THIS AGREEMENT, YOU SHALL NOT INSTALL THE SOFTWARE, OR USE IT IN OTHER WAYS.</h6>
+
+<p><strong>Images used are copyrighted and are used for demonstration only.</strong></p>
+
+<p><a href="http://cvi.netzgesta.de/">cvi.netzgesta.de</a>&nbsp;&nbsp;also visit&nbsp;&nbsp;<a href="http://lab.netzgesta.de/">CVI-lab</a>, <a href="http://s5.netzgesta.de/">S5 Reloaded</a> and <a href="http://ajaxfilmdb.sourceforge.net/">AJAX-FilmDB</a></p>
+
+</body>
+</html>

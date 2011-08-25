@@ -1,20 +1,123 @@
-<html>
-  <body>
-    {% for greeting in greetings %}
-      {% if greeting.author %}
-        <b>{{ greeting.author.nickname }}</b> wrote:
-      {% else %}
-       An anonymous person wrote:
-      {% endif %}
-      <blockquote>{{ greeting.content|escape }}</blockquote>
-    {% endfor %}
+﻿<html>
+    <head>
+        <title>Indoor Positioning</title>
+        <link type="text/css" rel="stylesheet" href="/style/bootstrap-1.1.0.css">
+        <link type="text/css" rel="stylesheet" href="/style/docs.css">
+        <script src="/script/shiftzoom.js"></script>
+        
+        <style type="text/css">
+            .round {
+                border-radius: 5px;
+                box-shadow: 0 2px 6px rgba(1,1,1,0.5);
+                padding: 20px 20px 0;
+            }
+        </style>
+        
+        <script>
+            function setName(index){
+                var name = document.getElementById('name');
+                var desc = document.getElementById('desc');
+                
+                var name_list = ['主臥室', '書房', '客廳'];
+                var desc_list = ['主臥室的規劃，是整個設計中非常重要的一環。對空間與功能上的要求也必須詳加考慮，才不會造成日後生活上的不便。', 
+                                 '一個規劃完善的書房，可以說是家裡的世外桃源、避風港。在這裡，你可以悠閒地看看書、聽聽音樂，即便只是望著窗外的景色發呆，都是一件十分過癮的事。',
+                                 '客廳設計的風格定位裝修之前首先就要確定自己想要的風格'];
+                name.value = name_list[index];
+                desc.value = desc_list[index];
+            }
+        </script>
+    </head>
+    
+    <body>
+        <div class="topbar"> 
+            <div class="fill"> 
+                <div class="container"> 
+                    <h3><a href="#">Indoor Positioning</a></h3> 
+                    <ul>
+                        <li class="active"><a>主畫面</a></li> 
+                        <li><a>輸出圖資</a></li> 
+                        <li><a>登出</a></li> 
+                    </ul>
+                    
+                    <ul class="nav secondary-nav"> 
+                        <li class="menu"> 
+                            <a class="menu">其他地圖</a> 
+                            <ul class="menu-dropdown"> 
+                                <li><a>國家圖書館</a></li> 
+                                <li><a>台大資訊系4樓</a></li> 
+                                <li><a>台北車站</a></li> 
+                            </ul> 
+                        </li> 
+                    </ul> 
+                </div> 
+            </div> 
+        </div> 
+      
+        <div class="container" style="padding-top: 40px;">
+            <div class="row show-grid"> 
+                <div class="span16 column">
+                    <div>大子學舍第六期</div>
+                </div> 
+            </div> <!-- /row --> 
+        
+            <div class="row"> 
+                <div class="span12 round" style="padding: 0; height: 400px;">
+                    <div><img src="/image/map.jpg" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
+                </div> 
+                
+                <div class="span4 round" style="padding: 0; height: 400px;">
+                    <table class="common-table zebra-striped">
+                        <tr><td onClick="setName(0);">主臥室</td></tr>
+                        <tr><td onClick="setName(1);">書房</td></tr>
+                        <tr><td onClick="setName(2);">客廳</td></tr>
+                    </table>
+                </div> 
+            </div> <!-- /row --> 
+            
+            <div class="row round" style="margin-top: 20px;">
+                <div class="span16 column">
+                    <div style="float: left; width: 30%; height: 150px;">
+                        <div class="input" style="margin-bottom: 68px;"> 
+                            <input class="xlarge" placeholder="地點名稱" id="name" name="xlInput" size="35" type="text" /> 
+                        </div> 
 
-    <form action="/sign" method="post">
-      <div><textarea name="content" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Sign Guestbook"></div>
-    </form>
-
-    <a href="{{ url }}">{{ url_linktext }}</a>
-
-  </body>
+                        <a href="" class="btn primary">儲存地圖</a> 
+                        <a href="" class="btn">產生此點條碼</a> 
+                    </div>
+                    
+                    <div style="float: left; width: 400px; height: 150px;">
+                        <div class="input"> 
+                            <textarea class="xxlarge" id="desc" name="textarea" style="width: 100%; height: 80%"></textarea> 
+                            <span class="help-block"> 
+                                請輸入此地點的詳細描述
+                            </span> 
+                        </div> 
+                    </div>
+                    
+                    <div style="float: right; width: 240; height: 150px;">
+                        <div class="input" style="border: 1px #aaa dotted; margin: 0 40px 0 0; padding: 50px 0; text-align: center;"> 
+                            將圖檔拖入此區
+                        </div> 
+                    </div>
+                </div> 
+            </div> <!-- /row --> 
+    </body>
 </html>
+<!--
+ {% for greeting in greetings %}
+                {% if greeting.author %}
+                    <b>{{ greeting.author.nickname }}</b> wrote:
+                {% else %}
+                    An anonymous person wrote:
+                {% endif %}
+                <blockquote>{{ greeting.content|escape }}</blockquote>
+            {% endfor %}
+
+            <form action="/sign" method="post">
+                <div><textarea name="content" rows="3" cols="60"></textarea></div>
+                <div><input type="submit" value="Sign Guestbook"></div>
+            </form>
+
+            <a href="{{ url }}">{{ url_linktext }}</a>
+        </div>
+        ->>

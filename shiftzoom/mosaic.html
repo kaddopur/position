@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="imagetoolbar" content="no" />
+	<link rel="icon" href="favicon.ico" type="image/ico" />
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+	<title>Mosaic</title>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+		 	font-family: georgia,serif;
+		 	font-style: italic; 
+			color: gray; 
+			background: white;
+		}	
+		p {margin-left: 48px;}
+		b {color: orange;}
+		#header {
+		 	font-weight: normal; 
+			margin-top: 24px;
+			margin-left: 48px;
+		}
+		#content { 
+			padding: 0;
+			margin-left: 48px;
+			width: 400px;
+			height: 400px;
+			border: 1px silver solid;
+			box-shadow: 0px 0px 5px #666666;
+			-webkit-box-shadow: 0px 0px 4px #666666;
+			-khtml-box-shadow: 0px 0px 4px #666666;
+		}
+		.frame {
+		 	width: 100px; 
+		 	height: 100px; 
+		 	background: url(images/indicator.gif) 50% 50% no-repeat; 
+		}
+		table, tr, td {
+			padding: 0;
+			margin: 0;
+		 	border: none; 
+		 	background-color: white;
+		}
+	</style>
+	<script type="text/javascript" language="javascript" src="shiftzoom.js"></script>
+	<script type="text/javascript">
+		<!--
+		if(document.images&&document.createElement&&document.getElementById){ 
+			document.writeln('<style type="text/css">'); 
+			document.writeln('img.shiftzoom { visibility: hidden; }'); 
+			document.writeln('<\/style>'); 
+		} 
+		shiftzoom.defaultOpacity = 50;
+		shiftzoom.defaultOverview = false;
+		shiftzoom.defaultCurpath = 'images/cursors/';
+		
+		function E(v) {return document.getElementById(v);}
+		function R() {return Math.floor(Math.random()*100);}
+		function mosaicImage(str,h,v) {
+			var i=0,j=0,x,y;
+			for(i=0;i<=v;i++) {j=0; y=i*33.33333333;
+				for(j=0;j<=h;j++) {x=j*33.33333333;
+					shiftzoom.set(E(str+((v*i)+j+1)),'buttons',false);
+					shiftzoom.zooming(E(str+((v*i)+j+1)),100);
+					shiftzoom.moveto(E(str+((v*i)+j+1)),x+'%',y+'%');
+				}
+			}
+		}
+		function randomImage(str,h,v) {
+			for(var i=0;i<=(v*h);i++) {
+				shiftzoom.zooming(E(str+(i+1)),R());
+				shiftzoom.moveto(E(str+(i+1)),R()+'%',R()+'%');
+			}
+		}
+		function resetImage(str,h,v) {
+			for(var i=0;i<=(v*h);i++) {
+				shiftzoom.set(E(str+(i+1)),'buttons',true);
+				shiftzoom.zooming(E(str+(i+1)),0);
+			}
+		}
+		function setNewImage(str,h,v,s,t) {
+			for(var i=0;i<=(v*h);i++) {
+				shiftzoom.source(E(str+(i+1)),s,t);
+			}
+		}
+		//-->
+	</script>
+</head>
+<body>
+<h2 id="header">Reshuffle the images</h2>
+<div id="content">
+<table cellpadding="0" cellspacing="0" border="0" >
+<tr>
+	<td><div class="frame"><img id="img1" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img2" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img3" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img4" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+</tr><tr>
+	<td><div class="frame"><img id="img5" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img6" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img7" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img8" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+</tr><tr>
+	<td><div class="frame"><img id="img9" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img10" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img11" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img12" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+</tr><tr>
+	<td><div class="frame"><img id="img13" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img14" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img15" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+	<td><div class="frame"><img id="img16" class="shiftzoom" onLoad="shiftzoom.add(this);" src="mosaic.jpg" width="100" height="100" alt="image" border="0" /></div></td>
+</tr>
+</table>
+</div>
+<p><strong>images:</strong> 
+<button type="button" onclick="resetImage('img',4,4);">reset</button>
+<button type="button" onclick="mosaicImage('img',4,4);">mosaic</button>
+<button type="button" onclick="randomImage('img',4,4);">random</button>
+<button type="button" onclick="setNewImage('img',4,4,'images/mosaic.jpg',true);">boy</button>
+<button type="button" onclick="setNewImage('img',4,4,'mosaic.jpg',false);">girl</button>
+<button type="button" onclick="alert('shiftzoom: '+shiftzoom.version+' ('+shiftzoom.released+')');">version</button>
+
+<small><br />...using user commands <b>set</b>, <b>source</b>, <b>zooming</b>, and <b>moveto</b></small>
+</p>
+</body>
+</html>
