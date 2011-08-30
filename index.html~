@@ -42,6 +42,8 @@
                 x=parseInt(relX/(p.z*(zoomX-1)+100)*100+p.x/100*imgWidth*(1-100/(p.z*(zoomX-1)+100)))
                 y=parseInt(relY/(p.z*(zoomY-1)+100)*100+p.y/100*imgHeight*(1-100/(p.z*(zoomY-1)+100)));
                 shiftzoom.construct( img,[{x:x, y:y, w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
+                alert('x: '+x+' y: '+y);
+                alert(imgWidth+' '+imgHeight+' '+((p.z*(zoomX-1)+100)/100)+' '+((p.z*(zoomY-1)+100)/100));
             }
             function setTimer(e){
                 timer=setTimeout(function(){addUnit(e);},1000);    
