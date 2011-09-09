@@ -27,12 +27,15 @@
             }
 
             var timer
+            var eNow
             function addUnit(e) {
+                if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5)
+                    return;
                 var img=document.getElementById("map1");
                 var back=document.getElementById("back");
                 var p=shiftzoom.get(img,'currentxyz');
-                backX=e.clientX-back.offsetLeft;
-                backY=e.clientY-back.offsetTop;
+                backX=e.pageX-back.offsetLeft;
+                backY=e.pageY-back.offsetTop;
                 imgWidth=shiftzoom.get(img,'maxwidth');
                 imgHeight=shiftzoom.get(img,'maxheight');
                 relX=(backX/back.offsetWidth)*imgWidth;
@@ -48,6 +51,9 @@
             }
             function clearTimer(){
                 clearTimeout(timer);
+            }
+            function trackMouse(e){
+                eNow=e;
             }
         </script>
     </head>
@@ -86,7 +92,7 @@
 
             <div class="row"> 
                 <div class="span12 round" style="padding: 0; height: 400px;">
-                    <div id="back" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/image/map.jpg" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
+                    <div id="back" onmousemove="trackMouse(event)" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/image/map.jpg" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
                 </div> 
 
                 <div class="span4 round" style="padding: 0; height: 400px;">
