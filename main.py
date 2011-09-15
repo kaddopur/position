@@ -16,35 +16,12 @@
 #
 import cgi
 import os
+from dbmodel import *
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.api import images
-
-class Map(db.Model):
-    author = db.UserProperty()
-    map_id = db.IntegerProperty()
-    map_ver = db.IntegerProperty()
-    title = db.TextProperty()
-    file = db.BlobProperty()
-    date = db.DateTimeProperty(auto_now_add=True)
-    
-class Point(db.Model):
-    map_id = db.IntegerProperty()
-    point_id = db.IntegerProperty()
-    title = db.TextProperty()
-    description = db.TextProperty()
-    x = db.IntegerProperty()
-    y = db.IntegerProperty()
-    date = db.DateTimeProperty(auto_now_add=True)
-    
-class PointPhoto(db.Model):
-    map_id = db.IntegerProperty()
-    point_id = db.IntegerProperty()
-    file = db.BlobProperty()
-    date = db.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp.RequestHandler):
     def get(self):
@@ -147,6 +124,7 @@ class UpdateMap(webapp.RequestHandler):
         map = db.get(self.request.get("key"))
         map.title = self.request.get("title")
         map.put()
+        print 'tite', map.title
         self.redirect('/')
 
 application = webapp.WSGIApplication([('/', MainPage),
