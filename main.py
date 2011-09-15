@@ -48,6 +48,29 @@ class PointPhoto(db.Model):
 
 class MainPage(webapp.RequestHandler):
     def get(self):
+        # build namespace
+        query = Map.all()
+        if query.count() < 1:
+            map = Map()
+            map.map_id = 0
+            map.put()
+        
+        query = Point.all()
+        if query.count() < 1:
+            point = Point()
+            point.map_id = 0
+            point.point_id = 0
+            point.put()
+            
+        query = PointPhoto.all()
+        if query.count() < 1:
+            point_photo = PointPhoto()
+            point_photo.map_id = 0
+            point_photo.point_id = 0
+            point_photo.put()
+            
+            
+        
         user = users.get_current_user()
         if not user:
             self.redirect(users.create_login_url(self.request.uri))
@@ -59,10 +82,6 @@ class MainPage(webapp.RequestHandler):
         query.filter('author =', user)
         query.order('-date')
         map = query.get()
-        
-        #print 'map', map
-        
-        
         
         template_values = {
             'logout_url': logout_url,
