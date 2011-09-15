@@ -22,49 +22,54 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 
-class Greeting(db.Model):
+class Map(db.Model):
     author = db.UserProperty()
-    content = db.StringProperty(multiline=True)
+    map_id = db.IntegerProperty()
+    map_ver = db.IntegerProperty()
+    title = db.Text()
+    file = db.Blob()
+    date = db.DateTimeProperty(auto_now_add=True)
+    
+class Point(db.Model):
+    map_id = db.IntegerProperty()
+    point_id = db.IntegerProperty()
+    title = db.Text()
+    description = db.Text()
+    x = db.IntegerProperty()
+    y = db.IntegerProperty()
+    date = db.DateTimeProperty(auto_now_add=True)
+    
+class PointPhoto(db.Model):
+    map_id = db.IntegerProperty()
+    point_id = db.IntegerProperty()
+    file = db.Blob()
     date = db.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp.RequestHandler):
     def get(self):
-        greetings_query = Greeting.all().order('-date')
-        greetings = greetings_query.fetch(10)
-
-        if users.get_current_user():
-            url = users.create_logout_url(self.request.uri)
-            url_linktext = 'Logout'
-        else:
-            url = users.create_login_url(self.request.uri)
-            url_linktext = 'Login'
-
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+        
+        # after log in
+        logout_url = users.create_logout_url(self.request.uri)
+        
+        query = Map.all()
+        query.filter('author =', user)
+        query.order('-date')
+        map = query.fetch(1)
+        
+        
+        
         template_values = {
-            'greetings': greetings,
-            'url': url,
-            'url_linktext': url_linktext,
-            }
-
-
+            'logout_url': logout_url
+        }
+            
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
+        
 
-class Guestbook(webapp.RequestHandler):
-    def post(self):
-        greeting = Greeting()
-
-        if users.get_current_user():
-            greeting.author = users.get_current_user()
-
-            greeting.content = self.request.get('content')
-            greeting.put()
-            self.redirect('/')
-        else:
-            self.redirect(users.create_login_url('/'))
-
-application = webapp.WSGIApplication(
-                                     [('/', MainPage),
-                                      ('/sign', Guestbook)],
+application = webapp.WSGIApplication([('/', MainPage)],
                                      debug=True)
 
 def main():
