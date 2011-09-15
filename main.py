@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-#
+﻿#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright 2007 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -124,14 +124,46 @@ class UpdateMap(webapp.RequestHandler):
         map = db.get(self.request.get("key"))
         map.title = self.request.get("title")
         map.put()
-        print 'tite', map.title
+        
+        
+        name_list = [u'主臥室', u'書房', u'客廳'];
+        desc_list = [u'主臥室的規劃，是整個設計中非常重要的一環。對空間與功能上的要求也必須詳加考慮，才不會造成日後生活上的不便。', 
+                u'一個規劃完善的書房，可以說是家裡的世外桃源、避風港。在這裡，你可以悠閒地看看書、聽聽音樂，即便只是望著窗外的景色發呆，都是一件十分過癮的事。',
+                u'客廳設計的風格定位裝修之前首先就要確定自己想要的風格'];
+                
+        for i in range(3):
+            point = Point()
+            point.map_id = 1
+            point.point_id = i+1
+            point.title = name_list[i]
+            point.description = desc_list[i]
+            point.put()
         self.redirect('/')
+        
+        
+class QRAll(webapp.RequestHandler):
+    def get(self):
+        map = db.get(self.request.get("key"))
+        
+        query = Point.all()
+        query.filter('map_id =', map.map_id)
+        query.order('point_id')
+        results = query.fetch(1000)
+        
+        template_values = {
+            'map': map,
+            'points': results
+        }
+            
+        path = os.path.join(os.path.dirname(__file__), 'qrcode_all.html')
+        self.response.out.write(template.render(path, template_values))
 
 application = webapp.WSGIApplication([('/', MainPage),
                                       ('/upload_map', UploadMap),
                                       ('/map_image', MapImage),
                                       ('/drop_map', DropMap),
-                                      ('/update_map', UpdateMap)],
+                                      ('/update_map', UpdateMap),
+                                      ('/qr_all', QRAll)],
                                      debug=True)
 
 def main():

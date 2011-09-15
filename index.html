@@ -64,7 +64,7 @@
                 <div class="container"> 
                     <h3><a href="#">Indoor Positioning</a></h3> 
                     <ul>
-                        <li><a>輸出圖資</a></li> 
+                        <li><a href="/qr_all?key={{ map.key }}">輸出圖資</a></li> 
                         <li><a href="{{ logout_url }}">登出</a></li> 
                     </ul>
                     <!--
@@ -132,12 +132,13 @@
             <div class="row round" style="margin-top: 20px;">
                 <div class="span16 column">
                     <div style="float: left; width: 30%; height: 150px;">
-                        <div class="input" style="margin-bottom: 68px;"> 
+                        <div class="input" style="margin-bottom: 25px;"> 
                             <input class="xlarge" placeholder="地點名稱" id="name" name="xlInput" size="35" type="text" /> 
                         </div> 
-
-                        <a href="" class="btn primary">儲存定位點</a> 
-                        <a href="" class="btn">產生此點條碼</a> 
+                        
+                        <p><a href="" class="btn">產生條碼</a></p>
+                        <p><a href="" class="btn primary">儲存定位點</a> <a href="" class="btn danger">刪除定位點</a></p>
+                        
                     </div>
 
                     <div style="float: left; width: 400px; height: 150px;">

@@ -4,15 +4,15 @@ class Map(db.Model):
     author = db.UserProperty()
     map_id = db.IntegerProperty()
     map_ver = db.IntegerProperty()
-    title = db.TextProperty()
+    title = db.StringProperty()
     file = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
     
 class Point(db.Model):
     map_id = db.IntegerProperty()
     point_id = db.IntegerProperty()
-    title = db.TextProperty()
-    description = db.TextProperty()
+    title = db.StringProperty()
+    description = db.StringProperty()
     x = db.IntegerProperty()
     y = db.IntegerProperty()
     date = db.DateTimeProperty(auto_now_add=True)

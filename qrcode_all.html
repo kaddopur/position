@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Indoor Positioning</title>
+        <link type="text/css" rel="stylesheet" href="/style/bootstrap-1.1.0.css">
+        <link type="text/css" rel="stylesheet" href="/style/docs.css">
+        <script src="/script/shiftzoom.js"></script>
+
+    </head>
+
+    <body>
+    {% for point in points %}
+        <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=http://xxx.appspot.com/show.html?mapID={{ point.map_id }}&amp;mapVer={{ map.map_ver }}&amp;pointID={{ point.point_id }}&amp;title={{ point.title }}">
+        {{ point.map_id }}<br>
+        {{ point.point_id }}<br>
+        {{ point.title }}<br>
+        {{ point.description }}<br>
+        {{ point.x  }}<br>
+        {{ point.y  }}<br>
+        <hr />
+    {% endfor %}
+    
+    http://xxx.appspot.com/show.html?mapID=1&mapVer=1&pointID=3&title=公司大門
+    </body>
+</html>
