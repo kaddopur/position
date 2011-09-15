@@ -84,15 +84,40 @@
         </div> 
 
         <div class="container" style="padding-top: 40px;">
-            <div class="row show-grid"> 
-                <div class="span16 column">
-                    <div>大子學舍第六期</div>
-                </div> 
+            <div class="row show-grid">
+                <form action="/update_map" enctype="multipart/form-data" method="post">
+                    <div class="span12 column">
+                        <input class="xlarge" id="xlInput" name="title" type="text" value="{{ map.title}}" style="margin: 0; padding: 0; width: 100%; height: 100%;" placeholder="地圖標題"/>
+                        <input type="hidden" name="key" value="{{ map.key }}">
+                    </div>
+                    {% if map %}
+                        <div class="span2 column">
+                            <input type="submit" class="btn primary" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; ">
+                        </div>
+                        <div class="span2 column">
+                            <input onclick="location.href='/drop_map?key={{ map.key }}'" class="btn danger" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                        </div>
+                    {% else %}
+                        <div class="span2 column">
+                            <input class="btn primary" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                        </div>
+                        <div class="span2 column">
+                            <input class="btn danger" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                        </div>
+                    {% endif %}
+                </form>
             </div> <!-- /row --> 
 
             <div class="row"> 
                 <div class="span12 round" style="padding: 0; height: 400px;">
-                    <div id="back" onmousemove="trackMouse(event)" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/image/map.jpg" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
+                    {% if map %}
+                        <div id="back" onmousemove="trackMouse(event)" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
+                    {% else %}
+                        <form action="/upload_map" enctype="multipart/form-data" method="post">
+                            <div><input type="file" name="img"/></div>
+                            <div><input type="submit" value="Upload"></div>
+                        </form>
+                    {% endif %}
                 </div> 
 
                 <div class="span4 round" style="padding: 0; height: 400px;">
@@ -111,7 +136,7 @@
                             <input class="xlarge" placeholder="地點名稱" id="name" name="xlInput" size="35" type="text" /> 
                         </div> 
 
-                        <a href="" class="btn primary">儲存地圖</a> 
+                        <a href="" class="btn primary">儲存定位點</a> 
                         <a href="" class="btn">產生此點條碼</a> 
                     </div>
 
@@ -133,21 +158,3 @@
             </div> <!-- /row --> 
         </body>
     </html>
-    <!--
-    {% for greeting in greetings %}
-    {% if greeting.author %}
-    <b>{{ greeting.author.nickname }}</b> wrote:
-    {% else %}
-    An anonymous person wrote:
-    {% endif %}
-    <blockquote>{{ greeting.content|escape }}</blockquote>
-    {% endfor %}
-
-    <form action="/sign" method="post">
-        <div><textarea name="content" rows="3" cols="60"></textarea></div>
-        <div><input type="submit" value="Sign Guestbook"></div>
-    </form>
-
-    <a href="{{ url }}">{{ url_linktext }}</a>
-</div>
-->>

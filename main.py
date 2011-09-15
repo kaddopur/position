@@ -21,20 +21,21 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
+from google.appengine.api import images
 
 class Map(db.Model):
     author = db.UserProperty()
     map_id = db.IntegerProperty()
     map_ver = db.IntegerProperty()
-    title = db.Text()
-    file = db.Blob()
+    title = db.TextProperty()
+    file = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
     
 class Point(db.Model):
     map_id = db.IntegerProperty()
     point_id = db.IntegerProperty()
-    title = db.Text()
-    description = db.Text()
+    title = db.TextProperty()
+    description = db.TextProperty()
     x = db.IntegerProperty()
     y = db.IntegerProperty()
     date = db.DateTimeProperty(auto_now_add=True)
@@ -42,7 +43,7 @@ class Point(db.Model):
 class PointPhoto(db.Model):
     map_id = db.IntegerProperty()
     point_id = db.IntegerProperty()
-    file = db.Blob()
+    file = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp.RequestHandler):
@@ -57,19 +58,84 @@ class MainPage(webapp.RequestHandler):
         query = Map.all()
         query.filter('author =', user)
         query.order('-date')
-        map = query.fetch(1)
+        map = query.get()
+        
+        #print 'map', map
         
         
         
         template_values = {
-            'logout_url': logout_url
+            'logout_url': logout_url,
+            'map': map
         }
             
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
-        
 
-application = webapp.WSGIApplication([('/', MainPage)],
+        
+class UploadMap(webapp.RequestHandler):
+    def post(self):
+        user = users.get_current_user()
+        
+        query = Map.all()
+        query.order('-map_id')
+        largest_map = query.get()
+        
+        map = Map()
+        map.author = user
+        
+        if largest_map:
+            map.map_id = query.get().map_id + 1
+        else:
+            map.map_id = 1
+        map.map_ver = 1
+        map.title = ''
+        map.file = db.Blob(self.request.get("img"))
+        map.put()
+        
+        self.redirect('/')
+        
+class MapImage(webapp.RequestHandler):
+    def get(self):
+        user = users.get_current_user()
+
+        map = db.get(self.request.get("key"))
+        
+        if map.file:
+            self.response.headers['Content-Type'] = "image"
+            self.response.out.write(map.file)
+        else:
+            self.response.out.write("No image")
+            
+            
+class DropMap(webapp.RequestHandler):
+    def get(self):
+        map = db.get(self.request.get("key"))
+        
+        #delete all points related to this map
+        query = Point.all()
+        query.filter('map_id =', map.map_id)
+        results = query.fetch(1000)
+        db.delete(results)
+        
+        #delete this map
+        db.delete(map)
+        
+        self.redirect('/')
+        
+class UpdateMap(webapp.RequestHandler):
+    def post(self):
+        map = db.get(self.request.get("key"))
+        map.title = self.request.get("title")
+        map.put()
+        self.redirect('/')
+
+
+application = webapp.WSGIApplication([('/', MainPage),
+                                      ('/upload_map', UploadMap),
+                                      ('/map_image', MapImage),
+                                      ('/drop_map', DropMap),
+                                      ('/update_map', UpdateMap)],
                                      debug=True)
 
 def main():
