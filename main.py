@@ -130,7 +130,6 @@ class UpdateMap(webapp.RequestHandler):
         map.put()
         self.redirect('/')
 
-
 application = webapp.WSGIApplication([('/', MainPage),
                                       ('/upload_map', UploadMap),
                                       ('/map_image', MapImage),
