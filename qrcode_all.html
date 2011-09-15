@@ -1,24 +1,43 @@
-<html>
+ï»¿<html>
     <head>
         <title>Indoor Positioning</title>
         <link type="text/css" rel="stylesheet" href="/style/bootstrap-1.1.0.css">
         <link type="text/css" rel="stylesheet" href="/style/docs.css">
         <script src="/script/shiftzoom.js"></script>
-
+        <style type="text/css"> 
+            .qr {
+                padding: 0;
+                margin: 0;
+                float: left; width: 30%; 
+                height: 100%; 
+            }
+            
+            .right {
+                padding: 0;
+                margin: 25 0 0;
+                float: left; width: 69%;  
+            }
+            
+            .line {
+                padding: 0;
+                margin: 0;
+                height: 240; 
+                border: 1px #555 solid;
+            }
+        </style> 
     </head>
 
-    <body>
-    {% for point in points %}
-        <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=http://xxx.appspot.com/show.html?mapID={{ point.map_id }}&amp;mapVer={{ map.map_ver }}&amp;pointID={{ point.point_id }}&amp;title={{ point.title }}">
-        {{ point.map_id }}<br>
-        {{ point.point_id }}<br>
-        {{ point.title }}<br>
-        {{ point.description }}<br>
-        {{ point.x  }}<br>
-        {{ point.y  }}<br>
-        <hr />
-    {% endfor %}
-    
-    http://xxx.appspot.com/show.html?mapID=1&mapVer=1&pointID=3&title=¤½¥q¤jªù
+    <body charset="utf 8">
+        <div class="container">
+            {% for result in results %}
+            <div class="line" >
+                <div class="qr"><img src="https://chart.googleapis.com/chart?chs=240x240&cht=qr&chl={{ result.1 }}"></div>
+                <div class="right">
+                    <h1>{{ forloop.counter }}ã€€ã€€{{ result.0.title }}</h1>
+                    <h4>{{ result.0.description }}</h4>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </body>
 </html>

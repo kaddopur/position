@@ -22,6 +22,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from google.appengine.api import images
+import urllib
 
 class MainPage(webapp.RequestHandler):
     def get(self):
@@ -148,11 +149,14 @@ class QRAll(webapp.RequestHandler):
         query = Point.all()
         query.filter('map_id =', map.map_id)
         query.order('point_id')
-        results = query.fetch(1000)
+        points = query.fetch(1000)
+        
+        urls = [ urllib.quote('http://indoorposition.appspot.com/show.html?mapID=%d&mapVer=%d&pointID=%d&title=' % (map.map_id, map.map_ver, point.point_id)) + point.title for point in points]
+        results = zip(points, urls)
         
         template_values = {
             'map': map,
-            'points': results
+            'results': results
         }
             
         path = os.path.join(os.path.dirname(__file__), 'qrcode_all.html')
