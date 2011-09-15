@@ -64,7 +64,13 @@
                 <div class="container"> 
                     <h3><a href="#">Indoor Positioning</a></h3> 
                     <ul>
-                        <li><a href="/qr_all?key={{ map.key }}">輸出圖資</a></li> 
+                        <li>
+                        {% if map %}
+                            <a href="/qr_all?key={{ map.key }}">輸出圖資</a>
+                        {% else %}
+                            <a>輸出圖資</a>
+                        {% endif %}
+                        </li> 
                         <li><a href="{{ logout_url }}">登出</a></li> 
                     </ul>
                     <!--
