@@ -9,8 +9,8 @@ class Map(db.Model):
     date = db.DateTimeProperty(auto_now_add=True)
     
 class Point(db.Model):
-    map_id = db.IntegerProperty()
-    point_id = db.IntegerProperty()
+    map_id = db.IntegerProperty(required=True)
+    point_id = db.IntegerProperty(required=True)
     title = db.StringProperty()
     description = db.StringProperty()
     x = db.IntegerProperty()

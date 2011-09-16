@@ -27,12 +27,15 @@
             }
 
             var timer
+            var eNow
             function addUnit(e) {
+                //if( Math.abs( eNow.pageX, e.pageX) > 5 || Math.abs( eNow.pageY, e.pageY) > 5)
+                //    return;
                 var img=document.getElementById("map1");
                 var back=document.getElementById("back");
                 var p=shiftzoom.get(img,'currentxyz');
-                backX=e.clientX-back.offsetLeft;
-                backY=e.clientY-back.offsetTop;
+                backX=e.pageX-back.offsetLeft;
+                backY=e.pageY-back.offsetTop;
                 imgWidth=shiftzoom.get(img,'maxwidth');
                 imgHeight=shiftzoom.get(img,'maxheight');
                 relX=(backX/back.offsetWidth)*imgWidth;
@@ -42,14 +45,15 @@
                 x=parseInt(relX/(p.z*(zoomX-1)+100)*100+p.x/100*imgWidth*(1-100/(p.z*(zoomX-1)+100)))
                 y=parseInt(relY/(p.z*(zoomY-1)+100)*100+p.y/100*imgHeight*(1-100/(p.z*(zoomY-1)+100)));
                 shiftzoom.construct( img,[{x:x, y:y, w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
-                alert('x: '+x+' y: '+y);
-                alert(imgWidth+' '+imgHeight+' '+((p.z*(zoomX-1)+100)/100)+' '+((p.z*(zoomY-1)+100)/100));
             }
             function setTimer(e){
                 timer=setTimeout(function(){addUnit(e);},1000);    
             }
             function clearTimer(){
                 clearTimeout(timer);
+            }
+            function trackMouse(e){
+                eNow=e;
             }
         </script>
     </head>
@@ -88,7 +92,7 @@
 
             <div class="row"> 
                 <div class="span12 round" style="padding: 0; height: 400px;">
-                    <div id="back" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/image/map.jpg" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
+                    <div id="back" onmousemove="trackMouse(event)" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/image/map.jpg" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
                 </div> 
 
                 <div class="span4 round" style="padding: 0; height: 400px;">
