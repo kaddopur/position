@@ -16,6 +16,7 @@
 #
 import cgi
 import os
+import simplejson
 from dbmodel import *
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -59,11 +60,21 @@ class MainPage(webapp.RequestHandler):
         query.filter('author =', user)
         query.order('-date')
         map = query.get()
-        
+        if map:
+            id = map.map_id
+        else:
+            id = 0
+            
+        Points = Point.all().fetch(5)
+        points_data = zip([point.x for point in Points], [point.y for point in Points], [point.point_id for point in Points])
+        #print kkk
         template_values = {
             'logout_url': logout_url,
-            'map': map
+            'map': map,
+            'points_data' : simplejson.dumps(points_data),
+            'all_points': Point.all().filter('map_id = ', id).fetch(5)
         }
+        
             
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
@@ -132,9 +143,7 @@ class UpdateMap(webapp.RequestHandler):
                 u'客廳設計的風格定位裝修之前首先就要確定自己想要的風格'];
                 
         for i in range(3):
-            point = Point()
-            point.map_id = 1
-            point.point_id = i+1
+            point = Point( map_id = map.map_id , point_id = i+1)
             point.title = name_list[i]
             point.description = desc_list[i]
             point.put()
@@ -158,12 +167,38 @@ class QRAll(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'qrcode_all.html')
         self.response.out.write(template.render(path, template_values))
 
+class AddPoint(webapp.RequestHandler):
+    def post(self):
+        map = db.get(self.request.get("key"))
+            
+        query = Point.all()
+        query.filter('map_id =', map.map_id)
+        query.order('-point_id')
+        
+        largest_point = query.get()
+        
+        point = Point()
+        
+        if largest_point:
+            point.point_id = largest_point.point_id + 1
+        else:
+            point.point_id = 1
+        point.title = ("new point")
+        point.map_id = map.map_id
+        point.x = int(self.request.get("x"))
+        point.y = int(self.request.get("y"))
+        print point.point_id
+        point.put()
+        self.redirect('/')
+        
+        
 application = webapp.WSGIApplication([('/', MainPage),
                                       ('/upload_map', UploadMap),
                                       ('/map_image', MapImage),
                                       ('/drop_map', DropMap),
                                       ('/update_map', UpdateMap),
-                                      ('/qr_all', QRAll)],
+                                      ('/qr_all', QRAll),
+                                      ('/add_point', AddPoint)],
                                      debug=True)
 
 def main():

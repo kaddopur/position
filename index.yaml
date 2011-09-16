@@ -26,3 +26,9 @@ indexes:
   properties:
   - name: map_id
   - name: point_id
+
+- kind: Point
+  properties:
+  - name: map_id
+  - name: point_id
+    direction: desc
