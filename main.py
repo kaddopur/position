@@ -203,13 +203,23 @@ class ShowJson(webapp.RequestHandler):
 		query = Map.all()
 		query.filter('map_id =', int(self.request.get('mapID')))
 		query.filter('map_ver =', int(self.request.get('mapVer')))
-		
 		map = query.get()
+
 		if map:
+			point_result = Point.all().filter('map_id =', int(self.request.get('mapID'))).fetch(1000)
+			points = []
+			for res in point_result:
+				points.append({"pointID": res.point_id,
+					           "title": res.title,
+							   "description": res.description,
+							   "coord": {"x": res.x, "y": res.y},
+							   "photo": []})
+
 			result = {"mapID": map.map_id,
 				 	  "mapVer": map.map_ver,
 				      "title": map.title,
-				      "map": "http://indoorposition.appspot.com/map_image?key=%s" % map.key() }
+				      "map": "http://indoorposition.appspot.com/map_image?key=%s" % map.key(),
+					  "points": points}
 			self.response.out.write(simplejson.dumps(result))
 		else:
 			self.error(404)
