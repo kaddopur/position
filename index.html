@@ -26,7 +26,19 @@
                 title.value = title_list[index];
 				desc.value = desc_list[index];
 				id.value = point_list[index][2];
+
 			}
+            function setIcon(index){
+                var point_list = {{ point_data }};
+                var icon = document.getElementById( point_list[index][2]).firstChild;
+                icon.src='image/icons/pin_none.png';
+            }
+            
+            function unsetIcon(index){
+                var point_list = {{ point_data }};
+                var icon = document.getElementById( point_list[index][2]).firstChild;
+                icon.src=icon.first;
+            }
 
             function post_to_url(path, params, method) {
                 method = method || "post"; // Set method to post by default, if not specified.
@@ -209,7 +221,7 @@
                 <div class="span4 round" style="padding: 0; height: 400px;">
                     <table class="common-table zebra-striped">
                         {% for point in points%}
-							<tr><td onClick="setName({{ forloop.counter0 }});">{{point.title}}</td></tr>
+							<tr><td onClick="setName({{ forloop.counter0 }});" onMouseOver="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});">{{point.title}}</td></tr>
                         {% endfor %}
                     </table>
                 </div> 
