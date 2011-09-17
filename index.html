@@ -25,7 +25,27 @@
                 name.value = name_list[index];
                 desc.value = desc_list[index];
             }
+            function post_to_url(path, params, method) {
+                method = method || "post"; // Set method to post by default, if not specified.
 
+                // The rest of this code assumes you are not using a library.
+                // It can be made less wordy if you use one.
+                var form = document.createElement("form");
+                form.setAttribute("method", method);
+                form.setAttribute("action", path);
+
+                for(var key in params) {
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", key);
+                    hiddenField.setAttribute("value", params[key]);
+            
+                    form.appendChild(hiddenField);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            }
             var timer
             var eNow
             function addUnit(e) {
@@ -45,6 +65,14 @@
                 x=parseInt(relX/(p.z*(zoomX-1)+100)*100+p.x/100*imgWidth*(1-100/(p.z*(zoomX-1)+100)))
                 y=parseInt(relY/(p.z*(zoomY-1)+100)*100+p.y/100*imgHeight*(1-100/(p.z*(zoomY-1)+100)));
                 shiftzoom.construct( img,[{x:x, y:y, w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
+                post_to_url("/add_point?key={{map.key}}",{"x":x, "y":y},"post");
+            }
+            function refresh(){
+                var Points = {{points_data}};
+                var img=document.getElementById("map1");
+                for( var i = 0 ; i < Points.length ; i ++){
+                    shiftzoom.construct( img,[{ id:Points[i][2] ,x:Points[i][0], y:Points[i][1], w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
+                }
             }
             function setTimer(e){
                 timer=setTimeout(function(){addUnit(e);},1000);    
@@ -111,7 +139,7 @@
             <div class="row"> 
                 <div class="span12 round" style="padding: 0; height: 400px;">
                     {% if map %}
-                        <div id="back" onmousemove="trackMouse(event)" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});" style="width: 100%; height: 100%;"></div>
+                        <div id="back" onmousemove="trackMouse(event)" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});refresh();" style="width: 100%; height: 100%;"></div>
                     {% else %}
                         <form action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input type="file" name="img"/></div>
@@ -125,6 +153,9 @@
                         <tr><td onClick="setName(0);">主臥室</td></tr>
                         <tr><td onClick="setName(1);">書房</td></tr>
                         <tr><td onClick="setName(2);">客廳</td></tr>
+                        {% for point in all_points%}
+                            <tr><td>{{point.title}}</td></tr>
+                        {% endfor %}
                     </table>
                 </div> 
             </div> <!-- /row --> 
