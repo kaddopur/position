@@ -160,7 +160,7 @@ class QRAll(webapp.RequestHandler):
         query.order('point_id')
         points = query.fetch(1000)
         
-        urls = [ urllib.quote('http://indoorposition.appspot.com/show.html?mapID=%d&mapVer=%d&pointID=%d&title=' % (map.map_id, map.map_ver, point.point_id)) + point.title for point in points]
+        urls = [ urllib.quote('http://indoorposition.appspot.com/show?mapID=%d&mapVer=%d&pointID=%d&title=' % (map.map_id, map.map_ver, point.point_id)) + point.title for point in points]
         results = zip(points, urls)
         
         template_values = {
@@ -196,13 +196,32 @@ class AddPoint(webapp.RequestHandler):
         self.redirect('/')
         
         
+class ShowJson(webapp.RequestHandler):
+	def get(self):
+		self.response.headers['Content-Type'] = 'text/plain'
+
+		query = Map.all()
+		query.filter('map_id =', int(self.request.get('mapID')))
+		query.filter('map_ver =', int(self.request.get('mapVer')))
+		
+		map = query.get()
+		if map:
+			result = {"mapID": map.map_id,
+				 	  "mapVer": map.map_ver,
+				      "title": map.title,
+				      "map": "http://indoorposition.appspot.com/map_image?key=%s" % map.key() }
+			self.response.out.write(simplejson.dumps(result))
+		else:
+			self.error(404)
+
 application = webapp.WSGIApplication([('/', MainPage),
                                       ('/upload_map', UploadMap),
                                       ('/map_image', MapImage),
                                       ('/drop_map', DropMap),
                                       ('/update_map', UpdateMap),
                                       ('/qr_all', QRAll),
-                                      ('/add_point', AddPoint)],
+                                      ('/add_point', AddPoint),
+									  ('/show', ShowJson)],
                                      debug=True)
 
 def main():
