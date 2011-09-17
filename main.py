@@ -125,17 +125,6 @@ class UpdateMap(webapp.RequestHandler):
         map.title = self.request.get("title")
         map.put()
         
-        
-        name_list = [u'主臥室', u'書房', u'客廳'];
-        desc_list = [u'主臥室的規劃，是整個設計中非常重要的一環。對空間與功能上的要求也必須詳加考慮，才不會造成日後生活上的不便。', 
-                u'一個規劃完善的書房，可以說是家裡的世外桃源、避風港。在這裡，你可以悠閒地看看書、聽聽音樂，即便只是望著窗外的景色發呆，都是一件十分過癮的事。',
-                u'客廳設計的風格定位裝修之前首先就要確定自己想要的風格'];
-                
-        for i in range(3):
-            point = Point( map_id = map.map_id , point_id = i+1)
-            point.title = name_list[i]
-            point.description = desc_list[i]
-            point.put()
         self.redirect('/')
         
         
@@ -178,7 +167,7 @@ class AddPoint(webapp.RequestHandler):
         point.put()
         
         
-        self.redirect('/?point='+str(point.point_id))
+        self.redirect('/?pointID='+str(point.point_id))
         
 class UpdatePoint(webapp.RequestHandler):
     def post(self):
@@ -189,7 +178,7 @@ class UpdatePoint(webapp.RequestHandler):
         point.description = self.request.get('description')
         point.put()
         
-        self.redirect('/')
+        self.redirect('/?pointID='+str(point.point_id))
 
 class DeletePoint(webapp.RequestHandler):
     def post(self):

@@ -80,21 +80,24 @@
                 for( var i = 0 ; i < Points.length ; i ++){
                     shiftzoom.construct( img,[{ id:Points[i][2] ,x:Points[i][0], y:Points[i][1], w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
 				}
-				/*
+				
 				var url = window.location.toString();
 				var str = "";
 
 				if(url.indexOf("?") != -1){ //url裡有"?"符號
  					var ary = url.split("?")[1].split("&");
-  					for(var i in ary){
-    					str += ary[i].split("=")[0]+":"; //變數名稱
-   						str += ary[i].split("=")[1]+"\n"; //變數值
- 					 }
-				}else{ //url裡沒有"?"符號
-  					str+="沒有get變數\n";
+					for(var i in ary){
+						if(ary[i].split("=")[0] == "pointID"){
+							for(var j in Points){
+								if(Points[j][2] == (ary[i].split("=")[1])){
+									setName(j);
+									return;
+								}
+							}
+							
+						}
+					}
 				}
-				window.alert(str);
-				*/
 				setName(0);
 			}
 
@@ -119,8 +122,9 @@
 			}
 
 			function deletePoint(){
+				var title = document.getElementById('point_title');
 				var id = document.getElementById('point_id');
- 				if (confirm("確定要刪除此定位點？")){
+ 				if (confirm("確定要刪除此定位點【" + title.value + "】？")){
 					post_to_url("/delete_point?key={{map.key}}",{"id":id.value},"post");
 				}
 			}
@@ -197,7 +201,7 @@
                     {% else %}
                         <form action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input type="file" name="img"/></div>
-                            <div><input type="submit" value="Upload"></div>
+                            <div><input type="submit" value="上傳地圖"></div>
                         </form>
                     {% endif %}
                 </div> 
@@ -217,10 +221,22 @@
                         <div class="input" style="margin-bottom: 25px;"> 
 							<input class="xlarge" placeholder="地點名稱" id="point_title" name="xlInput" size="35" type="text" />
 							<input type="hidden" id="point_id">
-                        </div>  
+						</div>
+
 						<p><div href="" class="btn">產生條碼</div></p>
-						<div class="btn primary" onClick="updatePoint();">儲存定位點</div>
-						<div class="btn danger" onClick="deletePoint();">刪除定位點</div>
+						<div class="btn primary" id="update_point">儲存定位點</div>
+						<div class="btn danger" id="delete_point">刪除定位點</div>
+						{% if map %}
+							<script>
+								var data = {{ point_data }};
+								if(data.length > 0){
+									document.getElementById('update_point').onclick = function(){updatePoint();};
+									document.getElementById('delete_point').onclick = function(){deletePoint();};
+								}
+							</script>
+						{% endif %}
+
+
                     </div>
 
                     <div style="float: left; width: 400px; height: 150px;">

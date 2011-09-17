@@ -18,12 +18,6 @@ indexes:
 
 - kind: Point
   properties:
-  - name: author
-  - name: map_id
-  - name: point_id
-
-- kind: Point
-  properties:
   - name: map_id
   - name: point_id
 
