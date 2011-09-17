@@ -166,7 +166,6 @@ class AddPoint(webapp.RequestHandler):
         point.y = int(self.request.get("y"))
         point.put()
         
-        
         self.redirect('/?pointID='+str(point.point_id))
         
 class UpdatePoint(webapp.RequestHandler):
@@ -187,7 +186,9 @@ class DeletePoint(webapp.RequestHandler):
         point = Point.all().filter('map_id = ', map.map_id).filter('point_id =', int(self.request.get('id'))).get()
         point.delete()
         
-        self.redirect('/')
+        point = Point.all().filter('map_id = ', map.map_id).order('title').get()
+        
+        self.redirect('/?pointID='+str(point.point_id))
         
         
 class ShowJson(webapp.RequestHandler):
