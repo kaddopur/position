@@ -14,10 +14,9 @@
         </style>
 
         <script>
-            
             function setName(index){
                 var name = document.getElementById('name');
-                var desc = document.getElementById('desc');/
+                var desc = document.getElementById('desc');
 
                 var name_list = ['主臥室', '書房', '客廳'];
                 var desc_list = ['主臥室的規劃，是整個設計中非常重要的一環。對空間與功能上的要求也必須詳加考慮，才不會造成日後生活上的不便。', 
@@ -26,50 +25,6 @@
                 name.value = name_list[index];
                 desc.value = desc_list[index];
             }
-
-            var timer;
-            var eNow;
-            function setTimer(e){
-                timer=setTimeout(function(){addUnit(e);},1000);    
-            }
-            
-            function clearTimer(){
-                clearTimeout(timer);
-            }
-            
-            function trackMouse(e){
-                eNow=e;
-            }
-            function addUnit(e) {
-                
-                if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5)
-                    return;
-                var img=document.getElementById("map1");
-                var back=document.getElementById("back");
-                var p=shiftzoom.get(img,'currentxyz');
-                backX=e.pageX-back.offsetLeft;
-                backY=e.pageY-back.offsetTop;
-                imgWidth=shiftzoom.get(img,'maxwidth');
-                imgHeight=shiftzoom.get(img,'maxheight');
-                relX=(backX/back.offsetWidth)*imgWidth;
-                relY=(backY/back.offsetHeight)*imgHeight;
-                zoomX=shiftzoom.get(img,'maxzoomx');
-                zoomY=shiftzoom.get(img,'maxzoomy');
-                x=parseInt(relX/(p.z*(zoomX-1)+100)*100+p.x/100*imgWidth*(1-100/(p.z*(zoomX-1)+100)))
-                y=parseInt(relY/(p.z*(zoomY-1)+100)*100+p.y/100*imgHeight*(1-100/(p.z*(zoomY-1)+100)));
-                shiftzoom.construct( img,[{x:x, y:y, w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
-                post_to_url("/add_point?key={{map.key}}",{"x":x, "y":y},"post");
-            }
-            
-            function refresh(){
-                var Points = {{points_data}};
-                var img=document.getElementById("map1");
-                for( var i = 0 ; i < Points.length ; i ++){
-                    shiftzoom.construct( img,[{ id:Points[i][2] ,x:Points[i][0], y:Points[i][1], w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
-                }
-                
-            }
-            
             function post_to_url(path, params, method) {
                 method = method || "post"; // Set method to post by default, if not specified.
 
@@ -91,8 +46,43 @@
                 document.body.appendChild(form);
                 form.submit();
             }
-            
-            
+            var timer
+            var eNow
+            function addUnit(e) {
+                if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5)
+                    return;
+                var img=document.getElementById("map1");
+                var back=document.getElementById("back");
+                var p=shiftzoom.get(img,'currentxyz');
+                backX=e.pageX-back.offsetLeft;
+                backY=e.pageY-back.offsetTop;
+                imgWidth=shiftzoom.get(img,'maxwidth');
+                imgHeight=shiftzoom.get(img,'maxheight');
+                relX=(backX/back.offsetWidth)*imgWidth;
+                relY=(backY/back.offsetHeight)*imgHeight;
+                zoomX=shiftzoom.get(img,'maxzoomx');
+                zoomY=shiftzoom.get(img,'maxzoomy');
+                x=parseInt(relX/(p.z*(zoomX-1)+100)*100+p.x/100*imgWidth*(1-100/(p.z*(zoomX-1)+100)))
+                y=parseInt(relY/(p.z*(zoomY-1)+100)*100+p.y/100*imgHeight*(1-100/(p.z*(zoomY-1)+100)));
+                shiftzoom.construct( img,[{x:x, y:y, w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
+                post_to_url("/add_point?key={{map.key}}",{"x":x, "y":y},"post");
+            }
+            function refresh(){
+                var Points = {{points_data}};
+                var img=document.getElementById("map1");
+                for( var i = 0 ; i < Points.length ; i ++){
+                    shiftzoom.construct( img,[{ id:Points[i][2] ,x:Points[i][0], y:Points[i][1], w:53, h:64 , pos:7, title:'', target:'Google_Maps', src:'image/icons/pin_out.png', src2:'image/icons/pin_over.png'}]);
+                }
+            }
+            function setTimer(e){
+                timer=setTimeout(function(){addUnit(e);},1000);    
+            }
+            function clearTimer(){
+                clearTimeout(timer);
+            }
+            function trackMouse(e){
+                eNow=e;
+            }
         </script>
     </head>
 
@@ -155,7 +145,7 @@
             <div class="row"> 
                 <div class="span12 round" style="padding: 0; height: 400px;">
                     {% if map %}
-                        <div id="back" onmousemove="trackMouse(event);" onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100}); refresh();"  style="width: 100%; height: 100%;"></div>
+                        <div id="back" onmousemove="trackMouse(event)" onmouseup="clearTimer()" onmousedown="setTimer(event)" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});refresh();" style="width: 100%; height: 100%;"></div>
                     {% else %}
                         <form action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input type="file" name="img"/></div>
@@ -172,7 +162,6 @@
                         {% for point in all_points%}
                             <tr><td>{{point.title}}</td></tr>
                         {% endfor %}
-                        
                     </table>
                 </div> 
             </div> <!-- /row --> 

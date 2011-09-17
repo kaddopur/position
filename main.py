@@ -68,7 +68,6 @@ class MainPage(webapp.RequestHandler):
             
         Points = Point.all().fetch(5)
         points_data = zip([point.x for point in Points], [point.y for point in Points], [point.point_id for point in Points])
-        #print kkk
         template_values = {
             'logout_url': logout_url,
             'map': map,
@@ -174,25 +173,22 @@ class QRAll(webapp.RequestHandler):
 class AddPoint(webapp.RequestHandler):
     def post(self):
         map = db.get(self.request.get("key"))
-            
+        
         query = Point.all()
         query.filter('map_id =', map.map_id)
         query.order('-point_id')
-        
         largest_point = query.get()
         
-        point = Point()
+        point = Point(map_id=map.map_id, point_id=1)
         
         if largest_point:
             point.point_id = largest_point.point_id + 1
-        else:
-            point.point_id = 1
         point.title = ("new point")
-        point.map_id = map.map_id
         point.x = int(self.request.get("x"))
         point.y = int(self.request.get("y"))
-        print point.point_id
         point.put()
+        
+        
         self.redirect('/')
         
         
