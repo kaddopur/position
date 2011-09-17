@@ -32,3 +32,8 @@ indexes:
   - name: map_id
   - name: point_id
     direction: desc
+
+- kind: Point
+  properties:
+  - name: map_id
+  - name: title

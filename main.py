@@ -27,18 +27,9 @@ import urllib
 
 class MainPage(webapp.RequestHandler):
     def get(self):
-        # build namespace
-        query = Map.all()
-        if query.count() < 1:
-            map = Map()
-            map.map_id = 0
-            map.put()
-        
         query = Point.all()
         if query.count() < 1:
-            point = Point()
-            point.map_id = 0
-            point.point_id = 0
+            point = Point(map_id=0, point_id=0)
             point.put()
             
         query = PointPhoto.all()
@@ -57,22 +48,25 @@ class MainPage(webapp.RequestHandler):
         # after log in
         logout_url = users.create_logout_url(self.request.uri)
         
-        query = Map.all()
-        query.filter('author =', user)
-        query.order('-date')
-        map = query.get()
+        map = Map.all().filter('author =', user).order('-date').get()
+        point_results = []
+        point_data = []
+        point_titles = []
+        point_descriptions = []
         if map:
-            id = map.map_id
-        else:
-            id = 0
+            point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
+            if point_results:
+                point_data = [(point.x, point.y, point.point_id) for point in point_results]
+                point_titles = [(point.title) for point in point_results]
+                point_descriptions = [(point.description) for point in point_results]
             
-        Points = Point.all().fetch(5)
-        points_data = zip([point.x for point in Points], [point.y for point in Points], [point.point_id for point in Points])
         template_values = {
             'logout_url': logout_url,
             'map': map,
-            'points_data' : simplejson.dumps(points_data),
-            'all_points': Point.all().filter('map_id = ', id).fetch(5)
+            'point_data': simplejson.dumps(point_data),
+            'point_titles': simplejson.dumps(point_titles),
+            'point_descriptions': simplejson.dumps(point_descriptions),
+            'points': point_results
         }
         
             
@@ -83,18 +77,13 @@ class MainPage(webapp.RequestHandler):
 class UploadMap(webapp.RequestHandler):
     def post(self):
         user = users.get_current_user()
+     
+        largest_map = Map.all().order('-map_id').get()
         
-        query = Map.all()
-        query.order('-map_id')
-        largest_map = query.get()
-        
-        map = Map()
-        map.author = user
-        
+        map = Map(author=user, map_id=1)
         if largest_map:
-            map.map_id = query.get().map_id + 1
-        else:
-            map.map_id = 1
+            map.map_id = largest_map.map_id + 1
+            
         map.map_ver = 1
         map.title = ''
         map.file = db.Blob(self.request.get("img"))
@@ -116,7 +105,7 @@ class MapImage(webapp.RequestHandler):
             
             
 class DropMap(webapp.RequestHandler):
-    def get(self):
+    def post(self):
         map = db.get(self.request.get("key"))
         
         #delete all points related to this map
@@ -156,7 +145,7 @@ class QRAll(webapp.RequestHandler):
         
         query = Point.all()
         query.filter('map_id =', map.map_id)
-        query.order('point_id')
+        query.order('title')
         points = query.fetch(1000)
         
         urls = [ urllib.quote('http://indoorposition.appspot.com/show?mapID=%d&mapVer=%d&pointID=%d&title=' % (map.map_id, map.map_ver, point.point_id)) + point.title for point in points]
@@ -183,11 +172,31 @@ class AddPoint(webapp.RequestHandler):
         
         if largest_point:
             point.point_id = largest_point.point_id + 1
-        point.title = ("new point")
+        point.title = (u'新定位點')
         point.x = int(self.request.get("x"))
         point.y = int(self.request.get("y"))
         point.put()
         
+        
+        self.redirect('/?point='+str(point.point_id))
+        
+class UpdatePoint(webapp.RequestHandler):
+    def post(self):
+        map = db.get(self.request.get("key"))
+        
+        point = Point.all().filter('map_id = ', map.map_id).filter('point_id =', int(self.request.get('id'))).get()
+        point.title = self.request.get('title')
+        point.description = self.request.get('description')
+        point.put()
+        
+        self.redirect('/')
+
+class DeletePoint(webapp.RequestHandler):
+    def post(self):
+        map = db.get(self.request.get("key"))
+        
+        point = Point.all().filter('map_id = ', map.map_id).filter('point_id =', int(self.request.get('id'))).get()
+        point.delete()
         
         self.redirect('/')
         
@@ -227,7 +236,9 @@ application = webapp.WSGIApplication([('/', MainPage),
                                       ('/update_map', UpdateMap),
                                       ('/qr_all', QRAll),
                                       ('/add_point', AddPoint),
-									  ('/show', ShowJson)],
+									  ('/show', ShowJson),
+                                      ('/update_point', UpdatePoint),
+                                      ('/delete_point', DeletePoint)],
                                      debug=True)
 
 def main():

@@ -1,8 +1,8 @@
 from google.appengine.ext import db
 
 class Map(db.Model):
-    author = db.UserProperty()
-    map_id = db.IntegerProperty()
+    author = db.UserProperty(required=True)
+    map_id = db.IntegerProperty(required=True)
     map_ver = db.IntegerProperty()
     title = db.StringProperty()
     file = db.BlobProperty()
