@@ -41,6 +41,18 @@
 										   src2: 'image/icons/marker_blue_hover.png'}]);
 			}
 
+            function setIcon(index){
+                var point_list = {{ point_data }};
+                var icon = document.getElementById( point_list[index][2]).firstChild;
+                icon.src = icon.secnd;
+            }
+            
+            function unsetIcon(index){
+                var point_list = {{ point_data }};
+                var icon = document.getElementById( point_list[index][2]).firstChild;
+                icon.src = icon.first;
+            }
+            
             function post_to_url(path, params, method) {
                 method = method || "post"; // Set method to post by default, if not specified.
 
@@ -110,14 +122,17 @@
 
             function refresh(){
 				var Points = {{point_data}};
+
 				var title_list = {{ point_titles }};
 				var img=document.getElementById("map1");
 				var id = document.getElementById('point_id');
 				var target = findIndex();
-
-				id.value = Points[target][2];
+                
+                if( target != undefined){
+                    id.value = Points[target][2];
+                }
 				for(var i=0 ; i<Points.length; i++){
-					if (i != target){
+					if ( target==undefined || i != target){
 						shiftzoom.construct( img, [{id: Points[i][2],
 							                        x: Points[i][0], 
 							                        y: Points[i][1],
@@ -128,9 +143,14 @@
 													href: '/?pointID=' + Points[i][2], 
 													src: 'image/icons/marker_pink.png', 
 													src2: 'image/icons/marker_pink_hover.png'}]);
+
 					}
+                    
 				}
-				setName(target);
+                if( target!=undefined){
+                    alert('shit');
+                    setName(id.value);
+                }
 			}
 
             function setTimer(e){
@@ -241,7 +261,7 @@
                 <div class="span4 round" style="padding: 0; height: 400px;">
                     <table class="common-table zebra-striped">
                         {% for point in points%}
-							<tr><td onClick="setName({{ forloop.counter0 }});">{{point.title}}</td></tr>
+							<tr><td  onMouseOver="setIcon({{ forloop.counter }});" onMouseOut="unsetIcon({{ forloop.counter }});"><a href='/?pointID={{ forloop.counter }}'>{{point.title}}</a></td></tr>
                         {% endfor %}
                     </table>
                 </div> 
