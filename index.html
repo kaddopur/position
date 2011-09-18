@@ -20,7 +20,7 @@
 				var title = document.getElementById('point_title');
 				var desc = document.getElementById('point_description');
 				var id = document.getElementById('point_id');
-
+                   
 				var title_list = {{ point_titles }};
 				var desc_list = {{ point_descriptions }};
 				var point_list = {{ point_data }};
@@ -29,6 +29,7 @@
 				desc.value = desc_list[index];
 				id.value = point_list[index][2];
 				
+                title.focus();
 				shiftzoom.destruct(img, true);
 				for(var i in Points){
 					if (i != index){
