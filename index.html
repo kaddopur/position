@@ -175,6 +175,18 @@
 					post_to_url("/drop_map?key={{map.key}}",{"x": 1}, "post");
 				}
 			}
+            
+            function setIcon(index){
+                var point_list = {{ point_data }};
+                var icon = document.getElementById( point_list[index][2]).firstChild;
+                icon.src = icon.secnd;
+            }
+            
+            function unsetIcon(index){
+                var point_list = {{ point_data }};
+                var icon = document.getElementById( point_list[index][2]).firstChild;
+                icon.src = icon.first;
+            }
 
         </script>
     </head>
@@ -250,7 +262,7 @@
                 <div class="span4 round" style="padding: 0; height: 400px; overflow: auto;">
                     <table class="common-table zebra-striped">
                         {% for point in points%}
-						<tr><td onClick="setName({{forloop.counter0}});" id="nav_{{point.point_id}}">{{point.title}}</td></tr>
+						<tr><td onClick="setName({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}">{{point.title}}</td></tr>
                         {% endfor %}
                     </table>
                 </div> 
