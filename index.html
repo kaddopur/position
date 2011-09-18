@@ -10,7 +10,7 @@
 				border-radius: 5px;
                 box-shadow: 0 2px 6px rgba(1,1,1,0.5);
                 padding: 20px 20px 0;
-            }
+			}		
         </style>
 
         <script>
@@ -29,8 +29,22 @@
 				desc.value = desc_list[index];
 				id.value = point_list[index][2];
 				
-				
-				shiftzoom.construct( img,[{id: Points[index][2],
+				shiftzoom.destruct(img, true);
+				for(var i in Points){
+					if (i != index){
+						shiftzoom.construct( img, [{id: Points[i][2],
+							                        x: Points[i][0], 
+							                        y: Points[i][1],
+													w: 25, 
+													h: 45,
+													pos: 8,
+													title: title_list[i], 
+													href: 'javascript:setName('+i+')', 
+													src: 'image/icons/marker_pink.png', 
+													src2: 'image/icons/marker_pink_hover.png'}]);
+						document.getElementById("nav_" + Points[i][2]).style.backgroundColor="#fafafa";
+					} else {
+						shiftzoom.construct( img,[{id: Points[index][2],
 					                       x: Points[index][0], 
 										   y: Points[index][1], 
 										   w: 25, 
@@ -39,20 +53,12 @@
 										   title: title_list[index],
 										   src: 'image/icons/marker_blue.png', 
 										   src2: 'image/icons/marker_blue_hover.png'}]);
+						document.getElementById("nav_" + Points[index][2]).style.backgroundColor="#C2FFFD";
+					}
+				}
+				shiftzoom.moveto(img, Points[index][0], Points[index][1]);
 			}
 
-            function setIcon(index){
-                var point_list = {{ point_data }};
-                var icon = document.getElementById( point_list[index][2]).firstChild;
-                icon.src = icon.secnd;
-            }
-            
-            function unsetIcon(index){
-                var point_list = {{ point_data }};
-                var icon = document.getElementById( point_list[index][2]).firstChild;
-                icon.src = icon.first;
-            }
-            
             function post_to_url(path, params, method) {
                 method = method || "post"; // Set method to post by default, if not specified.
 
@@ -117,40 +123,23 @@
 							}
 						}
 					}
+				} else {
+					return 0;
 				}
 			}
 
-            function refresh(){
+			function findID(){
 				var Points = {{point_data}};
+				var url = window.location.toString();
 
-				var title_list = {{ point_titles }};
-				var img=document.getElementById("map1");
-				var id = document.getElementById('point_id');
-				var target = findIndex();
-                
-                if( target != undefined){
-                    id.value = Points[target][2];
-                }
-				for(var i=0 ; i<Points.length; i++){
-					if ( target==undefined || i != target){
-						shiftzoom.construct( img, [{id: Points[i][2],
-							                        x: Points[i][0], 
-							                        y: Points[i][1],
-													w: 25, 
-													h: 45,
-													pos: 8,
-													title: title_list[i], 
-													href: '/?pointID=' + Points[i][2], 
-													src: 'image/icons/marker_pink.png', 
-													src2: 'image/icons/marker_pink_hover.png'}]);
-
+				if(url.indexOf("?") != -1){ //url裡有"?"符號
+ 					var ary = url.split("?")[1].split("&");
+					for(var i in ary){
+						if(ary[i].split("=")[0] == "pointID"){
+							return ary[i].split("=")[1];
+						}
 					}
-                    
 				}
-                if( target!=undefined){
-                    alert('shit');
-                    setName(id.value);
-                }
 			}
 
             function setTimer(e){
@@ -249,7 +238,7 @@
             <div class="row"> 
                 <div class="span12 round" style="padding: 0; height: 400px;">
                     {% if map %}
-                        <div id="back" onmousemove="trackMouse(event);" onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});refresh();" style="width: 100%; height: 100%;"></div>
+                        <div id="back" onmousemove="trackMouse(event);" onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});setName(findIndex());" style="width: 100%; height: 100%;"></div>
                     {% else %}
                         <form action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input type="file" name="img"/></div>
@@ -258,10 +247,10 @@
                     {% endif %}
                 </div> 
 
-                <div class="span4 round" style="padding: 0; height: 400px;">
+                <div class="span4 round" style="padding: 0; height: 400px; overflow: auto;">
                     <table class="common-table zebra-striped">
                         {% for point in points%}
-							<tr><td  onMouseOver="setIcon({{ forloop.counter }});" onMouseOut="unsetIcon({{ forloop.counter }});"><a href='/?pointID={{ forloop.counter }}'>{{point.title}}</a></td></tr>
+						<tr><td onClick="setName({{forloop.counter0}});" id="nav_{{point.point_id}}">{{point.title}}</td></tr>
                         {% endfor %}
                     </table>
                 </div> 

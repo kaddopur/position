@@ -166,7 +166,6 @@ class AddPoint(webapp.RequestHandler):
         point.y = int(self.request.get("y"))
         point.put()
         
-        
         self.redirect('/?pointID='+str(point.point_id))
         
 class UpdatePoint(webapp.RequestHandler):
