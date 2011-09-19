@@ -57,7 +57,10 @@
 						document.getElementById("nav_" + Points[index][2]).style.backgroundColor="#C2FFFD";
 					}
 				}
-				shiftzoom.moveto(img, Points[index][0], Points[index][1]);
+                var imgWidth=shiftzoom.get(img,'maxwidth');
+                var imgHeight=shiftzoom.get(img,'maxheight');
+				shiftzoom.kenburns(img, [100.0*Points[index][0]/imgWidth, 100.0*Points[index][1]/imgHeight, 100, 3]);
+				
 			}
 
             function post_to_url(path, params, method) {
