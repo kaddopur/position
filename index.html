@@ -60,7 +60,6 @@
                 var imgWidth=shiftzoom.get(img,'maxwidth');
                 var imgHeight=shiftzoom.get(img,'maxheight');
 				shiftzoom.kenburns(img, [100.0*Points[index][0]/imgWidth, 100.0*Points[index][1]/imgHeight, 100, 3]);
-				
 			}
 
             function post_to_url(path, params, method) {
@@ -192,6 +191,12 @@
                 icon.src = icon.first;
             }
 
+			function getQRSingle(){
+				var id = document.getElementById('point_id');
+				var targetURL = '/qr_single?key={{ map.key }}&pointID=' + id.value;
+
+				window.open(targetURL, '', 'height=240, width=240');
+			}
         </script>
     </head>
 
@@ -280,13 +285,14 @@
 							<input type="hidden" id="point_id">
 						</div>
 
-						<p><div href="" class="btn">產生條碼</div></p>
+						<p><div class="btn" id="get_qr_single">產生條碼</div></p>
 						<div class="btn primary" id="update_point">儲存定位點</div>
 						<div class="btn danger" id="delete_point">刪除定位點</div>
 						{% if map %}
 							<script>
 								var data = {{ point_data }};
 								if(data.length > 0){
+									document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
 									document.getElementById('update_point').onclick = function(){updatePoint();};
 									document.getElementById('delete_point').onclick = function(){deletePoint();};
 								}

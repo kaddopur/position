@@ -133,6 +133,22 @@ class QRAll(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'qrcode_all.html')
         self.response.out.write(template.render(path, template_values))
 
+class QRSingle(webapp.RequestHandler):
+	def get(self):
+		map = db.get(self.request.get('key'))
+		
+		query = Point.all()
+		query.filter('map_id =', map.map_id).filter('point_id =', int(self.request.get('pointID')))
+		point = query.get()
+		
+		targetURL = urllib.quote('http://indoorposition.appspot.com/show?mapID=%d&mapVer=%d&pointID=%d&title=' % (map.map_id, map.map_ver, point.point_id)) + point.title
+		template_values = {
+			'url': targetURL
+		}
+		
+		path = os.path.join(os.path.dirname(__file__), 'qrcode_single.html')
+		self.response.out.write(template.render(path, template_values))
+
 class AddPoint(webapp.RequestHandler):
 	def post(self):
 		map = db.get(self.request.get("key"))
@@ -212,6 +228,7 @@ application = webapp.WSGIApplication([('/', MainPage),
                                       ('/drop_map', DropMap),
                                       ('/update_map', UpdateMap),
                                       ('/qr_all', QRAll),
+                                      ('/qr_single', QRSingle),
                                       ('/add_point', AddPoint),
 									  ('/show', ShowJson),
                                       ('/update_point', UpdatePoint),
