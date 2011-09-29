@@ -86,8 +86,9 @@
             var timer
             var eNow
 			function addUnit(e) {
-				if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5)
-					return;
+                if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5){
+                    return;
+                }
 				var img=document.getElementById("map1");
                 var back=document.getElementById("back");
                 var p=shiftzoom.get(img,'currentxyz');
