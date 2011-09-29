@@ -200,7 +200,9 @@ class ShowJson(webapp.RequestHandler):
 
         if self.request.get('from') != 'client':
             self.response.headers['Content-Type'] = 'text/html'
+            self.response.out.write('<body charset=\'utf-8\'>')
             self.response.out.write('請使用專用使用者端軟體<p><a href=\'http://dl.dropbox.com/u/871055/posClient.apk\'>下載</a>')
+            self.response.out.write('</body>')
             return
 
         query = Map.all()
