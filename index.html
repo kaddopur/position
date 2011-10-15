@@ -4,7 +4,7 @@
         <link type="text/css" rel="stylesheet" href="/style/bootstrap-1.1.0.css">
         <link type="text/css" rel="stylesheet" href="/style/docs.css">
         <script src="/script/shiftzoom.js"></script>
-
+        
         <style type="text/css">
 			.round {
 				border-radius: 5px;
@@ -12,26 +12,154 @@
                 padding: 20px 20px 0;
 			}		
         </style>
-
+        
+        <script type="text/javascript" src="/script/jquery-1.3.2.js"></script> 
+        <script type="text/javascript" src="/script/jquery.form.js"></script> 
+     
+        
+      
         <script>
+
+            
+            var _Points = {{point_data}};
+            var _title_list = {{ point_titles }};
+            var _desc_list = {{ point_descriptions }};
+            
+            $(document).ready(function() { 
+                // bind 'myForm' and provide a simple callback function
+                var body = document.getElementById('body');
+                var options = {
+                    target:     '#body',
+                    type:       "POST",
+                    success:     showResponse  // post-submit callback 
+                };
+                $('#map_profile').ajaxForm();
+                //$('#mapForm').ajaxForm(options);
+                /*$('#mapForm').submit(function() { 
+                    // inside event callbacks 'this' is the DOM element so we first 
+                    // wrap it in a jQuery object and then invoke ajaxSubmit 
+                    //$(this).ajaxSubmit(options);
+                    alert('submit');
+                    uploadMapAjax();
+                    // !!! Important !!! 
+                    // always return false to prevent standard browser submit and page navigation 
+                    return false; 
+                }); */
+            });
+            
+            function showResponse(responseText, statusText, xhr, $form)  { 
+                var body = document.getElementById('body');
+                body.innerHTML = responseText;
+                //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + '\n\nThe output div should have already been updated with the responseText.');
+            }
+            
+            /*$('#submitButton').click(function(){
+                var form = document.getElementById('mapForm');
+                    $.ajax({
+                            type: "POST",
+                            url: form.action,
+                            data: form.serialize(),
+                            success: function(data){
+                                $('#content').html(data);
+                                $('#content').slideDown(800,function(){
+                                    $.unblockUI();
+                                });
+                            }
+                        });
+                    return false;
+                });
+            });*/
+            /*function uploadMapAjax (){
+                    var form = document.getElementById('mapForm');
+                    var img = document.getElementById('mapUpload');
+                    var body = document.getElementById('body');
+                    alert( img.value);
+                    body.innerHTML=$.ajax({
+                        type: "POST",
+                        data: {img:img.value},
+                        url: form.action,
+                        type: "POST",
+                        async:false,
+                        success: function(msg){
+                            //alert(msg);
+                        }
+                    }).responseText;
+                
+            }*/
+            /*function deleteMap(){
+				if (confirm("確定要刪除此地圖及所有定位點？"+"{{map.key}}"+"??")){
+					var body = document.getElementById('body');
+                    body.innerHTML = $.ajax({
+                          url: "/drop_map",
+                          global: false,
+                          type: "POST",
+                          data: {key : '{{map.key}}'},
+                          dataType: "html",
+                          async:false,
+                          success: function(msg){
+                             alert(msg);
+                          }
+                       }
+                    ).responseText;
+                    //("/drop_map?key={{map.key}}",{"x": 1}, "post");
+                    //doDeleteMap();
+				}
+			}*/
+            
 			function setName(index){
-				var Points = {{point_data}};
-				var img = document.getElementById("map1");	
+				/*
+                var Points = {{point_data}};
+				var title_list = {{ point_titles }};
+				var desc_list = {{ point_descriptions }};
+                */
+                var desc = document.getElementById('point_description');
+                desc.value = document.getElementById('shit').value;
+                
+                
+                if (index < 0) return;
+                var Points = _Points;
+				var title_list = _title_list;
+				var desc_list = _desc_list;
+                updateAll( index, Points, title_list, desc_list);
+			}
+
+            function updateAll(index,Points, title_list, desc_list){
+                
+                var img = document.getElementById("map1");	
 				var title = document.getElementById('point_title');
 				var desc = document.getElementById('point_description');
 				var id = document.getElementById('point_id');
-                   
-				var title_list = {{ point_titles }};
-				var desc_list = {{ point_descriptions }};
-				var point_list = {{ point_data }};
+                var point_list = Points
+                alert(index+" / "+ Points.length);
 
-                title.value = title_list[index];
-				desc.value = desc_list[index];
-				id.value = point_list[index][2];
+                // refresh Map
+                if( !(index < 0)){
+                    id.value = Points[index][2];
+                    title.value = title_list[index];
+                    desc.value = desc_list[index];
+                }
+                else{
+                    id.value = 0;
+                    title.value = '';
+                    desc.value = '';
+                }
 				
                 title.focus();
 				shiftzoom.destruct(img, true);
-				for(var i in Points){
+                navTable = document.getElementById('navTable');
+                while ( navTable.rows.length > 0 ){
+                    navTable.deleteRow(0);
+                }
+                for(var i in Points){
+                    // refresh navTable
+                    row = navTable.insertRow(-1); // tr
+                    //row.onclick = function(){setName( i );};
+                    row.setAttribute("onclick", "javascript:setName( "+i+ ");");
+                    row.setAttribute("onmousemove", "javascript:setIcon( "+i+ ");");
+                    row.setAttribute("onmouseout", "javascript:unsetIcon( "+i+ ");");
+                    row.id = "nav_"+(Points[i][2])
+                    cell = row.insertCell(); //td
+                    cell.innerHTML = title_list[i];
 					if (i != index){
 						shiftzoom.construct( img, [{id: Points[i][2],
 							                        x: Points[i][0], 
@@ -59,9 +187,12 @@
 				}
                 var imgWidth=shiftzoom.get(img,'maxwidth');
                 var imgHeight=shiftzoom.get(img,'maxheight');
-				shiftzoom.kenburns(img, [100.0*Points[index][0]/imgWidth, 100.0*Points[index][1]/imgHeight, 100, 3]);
+				if( !(index < 0)){
+                    shiftzoom.kenburns(img, [100.0*Points[index][0]/imgWidth, 100.0*Points[index][1]/imgHeight, 100, 3]);
+                }
 			}
 
+            
             function post_to_url(path, params, method) {
                 method = method || "post"; // Set method to post by default, if not specified.
 
@@ -111,11 +242,11 @@
 											src2: 'image/icons/marker_pink_hover.png'}]);
                 post_to_url("/add_point?key={{map.key}}",{"x":x, "y":y},"post");
 			}
-
+            
 			function findIndex(){
-				var Points = {{point_data}};
+				var Points = _Points;
 				var url = window.location.toString();
-
+                
 				if(url.indexOf("?") != -1){ //url裡有"?"符號
  					var ary = url.split("?")[1].split("&");
 					for(var i in ary){
@@ -127,13 +258,27 @@
 							}
 						}
 					}
-				} else {
+				} else if (Points.length>0){
 					return 0;
-				}
+				} else 
+                    //empty Points 
+                    return -1;
 			}
+            
+            function findIndexOf( point_id , list){
+
+                for(var j in list){
+                    if( list[j][2] == point_id){
+                        return j;
+                    }
+                }
+                return -1;
+			}
+            
+            
 
 			function findID(){
-				var Points = {{point_data}};
+				var Points = _Points;
 				var url = window.location.toString();
 
 				if(url.indexOf("?") != -1){ //url裡有"?"符號
@@ -147,9 +292,9 @@
 			}
 
             function setTimer(e){
-                timer=setTimeout(function(){addUnit(e);},1000);    
+                timer=setTimeout(function(){doAddPingAjax(e);},1000);    
 			}
-
+            
             function clearTimer(){
                 clearTimeout(timer);
 			}
@@ -159,7 +304,9 @@
 			}
 
 			function updatePoint(){
-				var title = document.getElementById('point_title');
+                if ( _Points.length <=0)
+                    return;
+                var title = document.getElementById('point_title');
 				var desc = document.getElementById('point_description');
 				var id = document.getElementById('point_id');
 
@@ -167,41 +314,210 @@
 			}
 
 			function deletePoint(){
-				var title = document.getElementById('point_title');
+				if ( _Points.length <=0)
+                    return;
+                var title = document.getElementById('point_title');
 				var id = document.getElementById('point_id');
- 				if (confirm("確定要刪除此定位點【" + title.value + "】？")){
+                if (confirm("確定要刪除此定位點【" + title.value + "】？")){
 					post_to_url("/delete_point?key={{map.key}}",{"id":id.value},"post");
 				}
 			}
 
 			function deleteMap(){
-				if (confirm("確定要刪除此地圖及所有定位點？")){
-					post_to_url("/drop_map?key={{map.key}}",{"x": 1}, "post");
+				if (confirm("確定要刪除此地圖及所有定位點？"+"{{map.key}}"+"??")){
+					var body = document.getElementById('body');
+                    body.innerHTML = $.ajax({
+                          url: "/drop_map",
+                          global: false,
+                          type: "POST",
+                          data: {key : '{{map.key}}'},
+                          dataType: "html",
+                          async:false,
+                          success: function(msg){
+                             //alert(msg);
+                          }
+                       }
+                    ).responseText;
+                    //("/drop_map?key={{map.key}}",{"x": 1}, "post");
+                    //doDeleteMap();
 				}
 			}
             
             function setIcon(index){
-                var point_list = {{ point_data }};
+                var point_list = _Points;
                 var icon = document.getElementById( point_list[index][2]).firstChild;
                 icon.src = icon.secnd;
             }
             
             function unsetIcon(index){
-                var point_list = {{ point_data }};
+                var point_list = _Points;
                 var icon = document.getElementById( point_list[index][2]).firstChild;
                 icon.src = icon.first;
             }
 
 			function getQRSingle(){
+                if ( _Points.length <=0)
+                    return;
 				var id = document.getElementById('point_id');
 				var targetURL = '/qr_single?key={{ map.key }}&pointID=' + id.value;
 
 				window.open(targetURL, '', 'height=240, width=240');
 			}
+            
+            
+            
+            /*
+             *  ajax part
+             */
+            var server = {};
+            InstallFunction(server, 'addPingAjax');
+            InstallFunction(server, 'deletePingAjax');
+            InstallFunction(server, 'updatePingAjax');
+            InstallFunction(server, 'deleteMapAjax');
+            InstallFunction(server, 'syncWithDB');
+            InstallFunction(server, 'doDeleteMap');
+            
+            
+            
+            function reloadMap(response){
+                index = findIndexOf(response.point_id,response.point_data);
+                // refresh data in js
+                _Points = response.point_data;
+				_title_list = response.point_titles;
+				_desc_list = response.point_descriptions;
+                
+                // sync the Map with databse
+                document.getElementById('point_id').value = response.point_id;
+                updateAll(index, response.point_data, response.point_titles, response.point_descriptions);
+            }
+            
+            function onDeleteMapSuccess(response){
+
+            }
+            
+            function doDeleteMapAjax(response){
+                if (confirm("確定要刪除此地圖及所有定位點？")){
+					server.deleteMapAjax("{{map.key}}",  onDeleteMapSuccess);
+                    //post_to_url("/drop_map?key={{map.key}}",{"x": 1}, "post");
+				}
+                
+            }
+                       
+            function onUpdateSuccess(response){
+                reloadMap(response);
+            }
+            
+            function doUpdatePingAjax(){
+                if ( _Points.length <=0)
+                    return;
+                var title = document.getElementById('point_title');
+				var desc = document.getElementById('point_description');
+				var id = document.getElementById('point_id');
+                
+                server.updatePingAjax("{{map.key}}", id.value, title.value, desc.value, onUpdateSuccess);
+				//post_to_url("/update_point?key={{map.key}}",{"title":title.value, "description":desc.value, "id":id.value},"post");
+            }
+            
+            function onDeleteSuccess(response){
+                reloadMap(response);
+            }
+            
+            function doDeletePingAjax(){
+                if ( _Points.length <=0)
+                    return;
+                var title = document.getElementById('point_title');
+				var id = document.getElementById('point_id');
+                if (confirm("確定要刪除此定位點【" + title.value + "】？")){
+                    server.deletePingAjax("{{map.key}}", id.value, onDeleteSuccess);
+					//post_to_url("/delete_point?key={{map.key}}",{"id":id.value},"post");
+				}
+            }
+            
+            function doSyncWithDB(){
+                server.doSyncWithDB();
+            }
+            
+            function onAddSuccess(response) {
+                reloadMap(response);
+            }
+            
+            function doAddPingAjax(e) {
+
+                if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5){
+                    return;
+                }
+				var img=document.getElementById("map1");
+                var back=document.getElementById("back");
+                var p=shiftzoom.get(img,'currentxyz');
+                backX=e.pageX-back.offsetLeft;
+                backY=e.pageY-back.offsetTop;
+                imgWidth=shiftzoom.get(img,'maxwidth');
+                imgHeight=shiftzoom.get(img,'maxheight');
+                relX=(backX/back.offsetWidth)*imgWidth;
+                relY=(backY/back.offsetHeight)*imgHeight;
+                zoomX=shiftzoom.get(img,'maxzoomx');
+                zoomY=shiftzoom.get(img,'maxzoomy');
+                x=parseInt(relX/(p.z*(zoomX-1)+100)*100+p.x/100*imgWidth*(1-100/(p.z*(zoomX-1)+100)))
+                y=parseInt(relY/(p.z*(zoomY-1)+100)*100+p.y/100*imgHeight*(1-100/(p.z*(zoomY-1)+100)));
+                
+                server.addPingAjax("{{map.key}}", x.toString(), y.toString(),onAddSuccess);
+            }
+            
+            function Request(function_name, opt_argv) {
+              // If optional arguments was not provided, create it as empty
+              if (!opt_argv)
+                opt_argv = new Array();
+             
+              // Find if the last arg is a callback function; save it
+              var callback = null;
+              var len = opt_argv.length;
+              if (len > 0 && typeof opt_argv[len-1] == 'function') {
+                callback = opt_argv[len-1];
+                opt_argv.length--;
+              }
+              var async = (callback != null);
+             
+              // Encode the arguments in to a URI
+              var query = 'action=' + encodeURIComponent(function_name);
+              for (var i = 0; i < opt_argv.length; i++) {
+                var key = 'arg' + i;
+                var val = JSON.stringify(opt_argv[i]);
+                query += '&' + key + '=' + encodeURIComponent(val);
+              }
+              query += '&time=' + new Date().getTime(); // IE cache workaround
+
+              // See http://en.wikipedia.org/wiki/XMLHttpRequest to make this cross-browser compatible
+              var req = new XMLHttpRequest();
+
+              // Create a 'GET' request w/ an optional callback handler 
+              req.open('GET', '/rpc?' + query, async);
+             
+              if (async) {
+                req.onreadystatechange = function() {
+                  if(req.readyState == 4 && req.status == 200) {
+                    var response = null;
+                    try {
+                     response = JSON.parse(req.responseText);
+                    } catch (e) {
+                     response = req.responseText;
+                    }
+                    callback(response);
+                  }
+                }
+              }
+             
+              // Make the actual request
+              req.send(null);
+            }
+            
+            function InstallFunction(obj, name) {
+              obj[name] = function() { Request(name, arguments); }
+            }
+            
         </script>
     </head>
 
-    <body>
+    <body id='body'>
         <div class="topbar"> 
             <div class="fill"> 
                 <div class="container"> 
@@ -234,7 +550,7 @@
 
         <div class="container" style="padding-top: 40px;">
             <div class="row show-grid">
-                <form action="/update_map" enctype="multipart/form-data" method="post">
+                <form id="map_profile" action="/update_map" enctype="multipart/form-data" method="post">
                     <div class="span12 column">
                         <input class="xlarge" id="xlInput" name="title" type="text" value="{{ map.title}}" style="margin: 0; padding: 0; width: 100%; height: 100%;" placeholder="地圖標題"/>
                         <input type="hidden" name="key" value="{{ map.key }}">
@@ -258,21 +574,21 @@
             </div> <!-- /row --> 
 
             <div class="row"> 
-                <div class="span12 round" style="padding: 0; height: 400px;">
+                <div id=mapArea class="span12 round" style="padding: 0; height: 400px;">
                     {% if map %}
                         <div id="back" onmousemove="trackMouse(event);" onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});setName(findIndex());" style="width: 100%; height: 100%;"></div>
                     {% else %}
-                        <form action="/upload_map" enctype="multipart/form-data" method="post">
-                            <div><input type="file" name="img"/></div>
-                            <div><input type="submit" value="上傳地圖"></div>
+                        <form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post">
+                            <div><input id="mapUpload" type="file" name="img"/></div>
+                            <div><input id="submitButton" type="submit" value="上傳地圖"></div>
                         </form>
                     {% endif %}
                 </div> 
 
                 <div class="span4 round" style="padding: 0; height: 400px; overflow: auto;">
-                    <table class="common-table zebra-striped">
+                    <table id="navTable" class="common-table zebra-striped">
                         {% for point in points%}
-						<tr><td onClick="setName({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}">{{point.title}}</td></tr>
+						<tr><td onClick="setName({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}">{{point.point_id}}</td></tr>
                         {% endfor %}
                     </table>
                 </div> 
@@ -284,6 +600,7 @@
                         <div class="input" style="margin-bottom: 25px;"> 
 							<input class="xlarge" placeholder="地點名稱" id="point_title" name="xlInput" size="35" type="text" />
 							<input type="hidden" id="point_id">
+                            <input type="hidden" value="{{shit}}" id="shit">
 						</div>
 
 						<p><div class="btn" id="get_qr_single">產生條碼</div></p>
@@ -291,12 +608,12 @@
 						<div class="btn danger" id="delete_point">刪除定位點</div>
 						{% if map %}
 							<script>
-								var data = {{ point_data }};
-								if(data.length > 0){
+                                //data = _Points;
+								//if(data.length > 0){
 									document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
-									document.getElementById('update_point').onclick = function(){updatePoint();};
-									document.getElementById('delete_point').onclick = function(){deletePoint();};
-								}
+									document.getElementById('update_point').onclick = function(){doUpdatePingAjax();};
+									document.getElementById('delete_point').onclick = function(){doDeletePingAjax();};
+								//}
 							</script>
 						{% endif %}
 
