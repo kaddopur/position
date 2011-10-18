@@ -158,7 +158,7 @@ class DropMap(webapp.RequestHandler):
         
         #delete all points related to this map
         query = Point.all()
-        query.filter('map_id =', map)
+        query.filter('map_id =', map.map_id)
         results = query.fetch(1000)
         db.delete(results)
         
