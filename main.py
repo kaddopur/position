@@ -212,51 +212,7 @@ class QRSingle(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), 'qrcode_single.html')
         self.response.out.write(template.render(path, template_values))
-
-class AddPoint(webapp.RequestHandler):
-    def post(self):
-        map = db.get(self.request.get("key"))
-        map.map_ver = map.map_ver + 1
-
-        query = Point.all()
-        query.filter('map_id =', map.map_id)
-        query.order('-point_id')
-        largest_point = query.get()
         
-        point = Point(map_id=map.map_id, point_id=1)
-        if largest_point:
-            point.point_id = largest_point.point_id + 1
-        point.title = (u'新定位點')
-        point.x = int(self.request.get("x"))
-        point.y = int(self.request.get("y"))
-        point.put()
-        map.put()
-        
-        self.redirect('/?pointID='+str(point.point_id))
-        
-class UpdatePoint(webapp.RequestHandler):
-    def post(self):
-        map = db.get(self.request.get("key"))
-        map.map_ver = map.map_ver + 1
-        
-        point = Point.all().filter('map_id = ', map.map_id).filter('point_id =', int(self.request.get('id'))).get()
-        point.title = self.request.get('title')
-        point.description = self.request.get('description')
-        point.put()
-        map.put()
-        
-        self.redirect('/?pointID='+str(point.point_id))
-
-class DeletePoint(webapp.RequestHandler):
-    def post(self):
-        map = db.get(self.request.get("key"))
-        map.map_ver = map.map_ver + 1
-        
-        point = Point.all().filter('map_id = ', map.map_id).filter('point_id =', int(self.request.get('id'))).get()
-        point.delete()
-        map.put()
-        
-        self.redirect('/')
         
 class ShowJson(webapp.RequestHandler):
     def get(self):
@@ -479,11 +435,8 @@ application = webapp.WSGIApplication([('/', MainPage),
                                       ('/update_map', UpdateMap),
                                       ('/qr_all', QRAll),
                                       ('/qr_single', QRSingle),
-                                      ('/add_point', AddPoint),
                                       ('/show', ShowJson),
-                                      ('/rpc', RPCHandler),
-                                      ('/update_point', UpdatePoint),
-                                      ('/delete_point', DeletePoint)],
+                                      ('/rpc', RPCHandler)],
                                      debug=True)
 
 def main():
