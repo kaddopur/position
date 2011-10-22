@@ -19,7 +19,7 @@
         
       
         <script>
-            var _debug = false;
+            var _debug = true;
             var _map_key = "{{map.key}}";
             var _Points = {{point_data}};
             var _title_list = {{ point_titles }};
@@ -159,22 +159,28 @@
              *  ajax by JQuery
              */
             function deleteMapAjax(){
-				if (confirm("確定要刪除此地圖及所有定位點？"+_map_key+"??")){
-					var body = document.getElementById('body');
-                    body.innerHTML = $.ajax({
-                          url: "/drop_map",
-                          global: false,
-                          type: "POST",
-                          data: {key : _map_key},
-                          dataType: "html",
-                          async:false,
-                          success: function(msg){
-                             if ( _debug)
-                                alert(msg);
-                          }
-                       }
-                    ).responseText;
-				}
+				if( _map_key.length){
+                    if (confirm("確定要刪除此地圖及所有定位點？"+_map_key+"??")){
+                        var body = document.getElementById('body');
+                        body.innerHTML = $.ajax({
+                              url: "/drop_map",
+                              global: false,
+                              type: "POST",
+                              data: {key : _map_key},
+                              dataType: "html",
+                              async:false,
+                              success: function(msg){
+                                 if ( _debug)
+                                    alert(msg);
+                              }
+                           }
+                        ).responseText;
+                    }
+                    _map_key = '';
+                    _Points = [];
+                    _title_list = [];
+                    _desc_list = [];
+                }
 			}
             
             
@@ -186,35 +192,41 @@
                 // bind 'myForm' and provide a simple callback function
                 var body = document.getElementById('body');
                 var options = {
-                    target:     '#body',
                     type:       "POST",
-                    success:     onUploadMapSuccess  // post-submit callback 
+                    success:     onUploadMapSuccess2  // post-submit callback 
                 };
                 $('#map_profile').ajaxForm();
-                //$('#mapForm').ajaxForm(options);
-                /*$('#mapForm').submit(function() { 
-                    // inside event callbacks 'this' is the DOM element so we first 
-                    // wrap it in a jQuery object and then invoke ajaxSubmit 
-                    //$(this).ajaxSubmit(options);
-                    if ( _debug)
-                        alert('submit');
-                    uploadMapAjax();
-                    // !!! Important !!! 
-                    // always return false to prevent standard browser submit and page navigation 
-                    return false; 
-                }); */
+                $('#mapForm').ajaxForm(options);
             });
             
             function onUploadMapSuccess(responseText, statusText, xhr, $form)  { 
                 var body = document.getElementById('body');
                 console.log(body);
                 //body.innerHTML = responseText;
+                if ( _debug)
+                    alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + '\n\nThe output div should have already been updated with the responseText.');
+            }
+            
+            function onUploadMapSuccess2(responseText, statusText, xhr, $form)  { 
+                var mapArea = document.getElementById('mapArea');
                 
+                console.log(mapArea);
+                if ( _debug)
+                    alert('xxstatus: ' + statusText + '\n\nresponseText: \n' + responseText + '\n\nThe output div should have already been updated with the responseText.');
+                //body.innerHTML = responseText;
+                mapArea.innerHTML = '<div id="back" onmousemove="trackMouse(event);" onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key='+responseText+'" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});setName(findIndex());" style="width: 100%; height: 100%;"></div>';
+                _map_key = responseText;
                 _Points = [];
                 _title_list = [];
                 _desc_list = [];
-                if ( _debug)
-                    alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + '\n\nThe output div should have already been updated with the responseText.');
+                
+                document.getElementById('map_profile').key.value = _map_key;
+                document.getElementById('save_map').type = 'submit';
+                $('#delete_map').onclick = function(){deleteMapAjax();}
+                document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
+                document.getElementById('update_point').onclick = function(){doUpdatePingAjax();};
+                document.getElementById('delete_point').onclick = function(){doDeletePingAjax();};
+                return false;
             }
             
             /*************************************************************/
@@ -226,6 +238,7 @@
             InstallFunction(server, 'deletePingAjax');
             InstallFunction(server, 'updatePingAjax');
             InstallFunction(server, 'syncWithDB');
+            InstallFunction(server, 'uploadMapAjax');
             
             function InstallFunction(obj, name) {
               obj[name] = function() { Request(name, arguments); }
@@ -242,7 +255,23 @@
                 document.getElementById('point_id').value = response.point_id;
                 reloadElement(index, response.point_data, response.point_titles, response.point_descriptions);
             }
-                                   
+            
+                        
+            function onUploadSuccess(response) {
+                //refreshMap(response);
+                alert( response.map_key);
+            }
+            
+            function doUploadMapAjax(){
+                if( $('#mapForm').length ){
+                    mapForm = document.getElementById('mapForm');
+                    alert(  mapForm.img.value);
+                    server.uploadMapAjax( mapForm.img , onUploadSuccess);
+                }
+            }
+
+            
+            
             function onUpdateSuccess(response){
                 refreshMap(response);
             }
@@ -270,10 +299,11 @@
                     server.deletePingAjax(_map_key, id.value, onDeleteSuccess);
 				}
             }
-                        
+            
             function onAddSuccess(response) {
                 refreshMap(response);
             }
+            
             
             function doAddPingAjax(e) {
 
@@ -429,24 +459,24 @@
 
         <div class="container" style="padding-top: 40px;">
             <div class="row show-grid">
-                <form id="map_profile" action="/update_map" enctype="multipart/form-data" method="post">
+                <form id="map_profile" action="/update_map" enctype="multipart/form-data" method="get">
                     <div class="span12 column">
                         <input class="xlarge" id="xlInput" name="title" type="text" value="{{ map.title}}" style="margin: 0; padding: 0; width: 100%; height: 100%;" placeholder="地圖標題"/>
                         <input type="hidden" name="key" value="{{ map.key }}">
                     </div>
                     {% if map %}
                         <div class="span2 column">
-                            <input type="submit" class="btn primary" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; ">
+                            <input type="submit" class="btn primary" id="save_map" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; ">
                         </div>
                         <div class="span2 column">
-                            <input onclick="deleteMapAjax();" class="btn danger" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                            <input onclick="deleteMapAjax();" class="btn danger" id="delete_map" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
                     {% else %}
                         <div class="span2 column">
-                            <input class="btn primary" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                            <input class="btn primary" id="save_map" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
                         <div class="span2 column">
-                            <input class="btn danger" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                            <input onclick="deleteMapAjax();" class="btn danger" id="delete_map" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
                     {% endif %}
                 </form>
@@ -460,6 +490,7 @@
                         <form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input id="mapUpload" type="file" name="img"/></div>
                             <div><input id="submitButton" type="submit" value="上傳地圖"></div>
+                            <!--<div><input type="button" value="上傳地圖" onclick="doUploadMapAjax();"></button></div> -->
                         </form>
                     {% endif %}
                 </div> 

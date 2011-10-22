@@ -136,9 +136,9 @@ class UploadMap(BaseRequestHandler):
             'map': map,
         }
         
-        self.response.out.write(self.generate('index.html',template_values))
-        
-        self.redirect('/')
+        #self.response.out.write(self.generate('index.html',template_values))
+        self.response.out.write(map.key())
+
         
 class MapImage(webapp.RequestHandler):
     def get(self):
@@ -152,7 +152,7 @@ class MapImage(webapp.RequestHandler):
         else:
             self.response.out.write("No image")
                         
-class DropMap(webapp.RequestHandler):
+class DropMap(BaseRequestHandler):
     def post(self):
         map = db.get(self.request.get("key"))
         
@@ -164,11 +164,15 @@ class DropMap(webapp.RequestHandler):
         
         #delete this map
         db.delete(map)
+        template_values = {
+            'map': None,
+        }
+        self.response.out.write( self.generate('index.html',template_values))
         
-        self.redirect('/')
+        #self.redirect('/')
         
 class UpdateMap(webapp.RequestHandler):
-    def post(self):
+    def get(self):
         map = db.get(self.request.get("key"))
         map.title = self.request.get("title")
         map.map_ver = map.map_ver + 1
@@ -286,20 +290,7 @@ class RPCMethods:
     """ Defines the methods that can be RPCed.
     NOTE: Do not allow remote callers access to private/protected "_*" methods.
     """
-    def deleteMapAjax( self, *args):
-        mapkey = args[0]
-        
-        map = db.get(mapkey)
-        
-        #delete all points related to this map
-        query = Point.all()
-        query.filter('map_id =', map.map_id)
-        results = query.fetch(1000)
-        db.delete(results)
-        
-        #delete this map
-        db.delete(map)
-        
+   
     def addPingAjax(self, *args):
         
         #add new ping into database
@@ -425,7 +416,7 @@ class RPCMethods:
         }
         
         return template_values
-    
+     
   
     
 application = webapp.WSGIApplication([('/', MainPage),
