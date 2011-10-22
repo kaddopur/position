@@ -198,7 +198,16 @@
                 $('#map_profile').ajaxForm();
                 $('#mapForm').ajaxForm(options);
             });
-            
+            function uploadMap(){ 
+                // submit the form 
+                var options = {
+                    type:       "POST",
+                    success:     onUploadMapSuccess2  // post-submit callback 
+                };
+                $('#mapForm').ajaxSubmit(options); 
+                // return false to prevent normal browser submit and page navigation 
+                return false; 
+            }
             function onUploadMapSuccess(responseText, statusText, xhr, $form)  { 
                 var body = document.getElementById('body');
                 console.log(body);
@@ -489,7 +498,7 @@
                     {% else %}
                         <form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input id="mapUpload" type="file" name="img"/></div>
-                            <div><input id="submitButton" type="submit" value="上傳地圖"></div>
+                            <div><input id="submitButton" type="button" onclick="uploadMap();" value="上傳地圖"></div>
                             <!--<div><input type="button" value="上傳地圖" onclick="doUploadMapAjax();"></button></div> -->
                         </form>
                     {% endif %}
