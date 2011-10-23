@@ -175,14 +175,29 @@
                               }
                            }
                         ).responseText;
+                        _map_key = '';
+                        _Points = [];
+                        _title_list = [];
+                        _desc_list = [];
                     }
-                    _map_key = '';
-                    _Points = [];
-                    _title_list = [];
-                    _desc_list = [];
                 }
 			}
             
+            function updateMapAjax(){
+                if( _map_key.length){
+                    map_profile = document.getElementById('map_profile');
+                    $.ajax({
+                        url: map_profile.action,
+                        global: false,
+                        type: map_profile.method,
+                        data: { title: map_profile.title.value, key: _map_key},
+                        success: function(msg){
+                            if( _debug)
+                                alert(map_profile.action);
+                        }
+                    });
+                }
+            }
             
             /*************************************************************/
             /*
@@ -193,7 +208,7 @@
                 var body = document.getElementById('body');
                 var options = {
                     type:       "POST",
-                    success:     onUploadMapSuccess2  // post-submit callback 
+                    success:     onUploadMapSuccess  // post-submit callback 
                 };
                 $('#map_profile').ajaxForm();
                 $('#mapForm').ajaxForm(options);
@@ -202,21 +217,14 @@
                 // submit the form 
                 var options = {
                     type:       "POST",
-                    success:     onUploadMapSuccess2  // post-submit callback 
+                    success:     onUploadMapSuccess  // post-submit callback 
                 };
                 $('#mapForm').ajaxSubmit(options); 
                 // return false to prevent normal browser submit and page navigation 
                 return false; 
             }
-            function onUploadMapSuccess(responseText, statusText, xhr, $form)  { 
-                var body = document.getElementById('body');
-                console.log(body);
-                //body.innerHTML = responseText;
-                if ( _debug)
-                    alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + '\n\nThe output div should have already been updated with the responseText.');
-            }
             
-            function onUploadMapSuccess2(responseText, statusText, xhr, $form)  { 
+            function onUploadMapSuccess(responseText, statusText, xhr, $form)  { 
                 var mapArea = document.getElementById('mapArea');
                 
                 console.log(mapArea);
@@ -230,8 +238,8 @@
                 _desc_list = [];
                 
                 document.getElementById('map_profile').key.value = _map_key;
-                document.getElementById('save_map').type = 'submit';
-                $('#delete_map').onclick = function(){deleteMapAjax();}
+                document.getElementById('update_map').onclick = function(){updateMapAjax();};
+                document.getElementById('delete_map').onclick = function(){deleteMapAjax();};
                 document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
                 document.getElementById('update_point').onclick = function(){doUpdatePingAjax();};
                 document.getElementById('delete_point').onclick = function(){doDeletePingAjax();};
@@ -247,7 +255,6 @@
             InstallFunction(server, 'deletePingAjax');
             InstallFunction(server, 'updatePingAjax');
             InstallFunction(server, 'syncWithDB');
-            InstallFunction(server, 'uploadMapAjax');
             
             function InstallFunction(obj, name) {
               obj[name] = function() { Request(name, arguments); }
@@ -264,21 +271,6 @@
                 document.getElementById('point_id').value = response.point_id;
                 reloadElement(index, response.point_data, response.point_titles, response.point_descriptions);
             }
-            
-                        
-            function onUploadSuccess(response) {
-                //refreshMap(response);
-                alert( response.map_key);
-            }
-            
-            function doUploadMapAjax(){
-                if( $('#mapForm').length ){
-                    mapForm = document.getElementById('mapForm');
-                    alert(  mapForm.img.value);
-                    server.uploadMapAjax( mapForm.img , onUploadSuccess);
-                }
-            }
-
             
             
             function onUpdateSuccess(response){
@@ -475,17 +467,17 @@
                     </div>
                     {% if map %}
                         <div class="span2 column">
-                            <input type="submit" class="btn primary" id="save_map" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; ">
+                            <input onclick="updateMapAjax();" type="button" class="btn primary" id="update_map" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; ">
                         </div>
                         <div class="span2 column">
-                            <input onclick="deleteMapAjax();" class="btn danger" id="delete_map" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                            <input onclick="deleteMapAjax();" type="button" class="btn danger" id="delete_map" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
                     {% else %}
                         <div class="span2 column">
-                            <input class="btn primary" id="save_map" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                            <input type="button" class="btn primary" id="update_map" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
                         <div class="span2 column">
-                            <input onclick="deleteMapAjax();" class="btn danger" id="delete_map" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
+                            <input type="button" class="btn danger" id="delete_map" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
                     {% endif %}
                 </form>
