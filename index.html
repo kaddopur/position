@@ -19,7 +19,7 @@
         
       
         <script>
-            var _debug = true;
+            var _debug = false;
             var _map_key = "{{map.key}}";
             var _Points = {{point_data}};
             var _title_list = {{ point_titles }};
@@ -69,14 +69,16 @@
                 }
                 for(var i in Points){
                     // refresh navTable
-                    row = navTable.insertRow(-1); // tr
+                    var row = navTable.insertRow(-1); // tr
                     //row.onclick = function(){setName( i );};
                     row.setAttribute("onclick", "javascript:setName( "+i+ ");");
                     row.setAttribute("onmousemove", "javascript:setIcon( "+i+ ");");
                     row.setAttribute("onmouseout", "javascript:unsetIcon( "+i+ ");");
                     row.id = "nav_"+(Points[i][2])
-                    cell = row.insertCell(); //td
+                    var cell = row.insertCell(-1); //td
                     cell.innerHTML = title_list[i];
+                    var cellButton = row.insertCell(-1);
+                    cellButton.innerHTML = '<input type="image" src="image/icons/delete_button.png" alt="Delete" width="20" height="20" align="RIGHT" onclick="event.cancelBubble=true;doDeletePingAjax();" >';
 					if (i != index){
 						shiftzoom.construct( img, [{id: Points[i][2],
 							                        x: Points[i][0], 
@@ -491,16 +493,19 @@
                         <form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input id="mapUpload" type="file" name="img"/></div>
                             <div><input id="submitButton" type="button" onclick="uploadMap();" value="上傳地圖"></div>
-                            <!--<div><input type="button" value="上傳地圖" onclick="doUploadMapAjax();"></button></div> -->
                         </form>
                     {% endif %}
                 </div> 
 
                 <div class="span4 round" style="padding: 0; height: 400px; overflow: auto;">
                     <table id="navTable" class="common-table zebra-striped">
+                        <!--
                         {% for point in points%}
-						<tr><td onClick="setName({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}">{{point.point_id}}</td></tr>
+						<tr><td onClick="setName({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}"><img src="image/icons/delete_button.png" alt="Delete" width="30" height="30" align="RIGHT" />{{point.title}}</td>
+                            
+                        </tr>
                         {% endfor %}
+                        -->
                     </table>
                 </div> 
             </div> <!-- /row --> 
