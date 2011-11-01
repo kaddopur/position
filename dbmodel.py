@@ -22,3 +22,4 @@ class PointPhoto(db.Model):
     point_id = db.IntegerProperty()
     file = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
+    title = db.StringProperty()

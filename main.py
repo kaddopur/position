@@ -139,6 +139,38 @@ class UploadMap(BaseRequestHandler):
         #self.response.out.write(self.generate('index.html',template_values))
         self.response.out.write(map.key())
 
+class UploadImage(BaseRequestHandler):
+    def post(self):
+        user = users.get_current_user()
+     
+        photo = PointPhoto()
+        
+        map = db.get(self.request.get("map_key"))
+        photo.map_id = map.map_id
+        photo.point_id = int(self.request.get('point_id'))
+        img = self.request.get('files[]')
+        photo.file = db.Blob(str(img))
+        photo.title = self.request.get("point_id")
+        
+        photo.put()
+        #seed = user
+        #map.key = KEY( user + str(map.map_id) + str(map.map_ver))
+        
+        
+        #map = Map.all().filter('author =', user).order('-date').get();
+
+        #path = os.path.join(os.path.dirname(__file__), 'index.html')
+        #self.response.out.write(template.render(path, template_values))
+        #self.response.headers['Content-Type'] = "image"
+        #self.response.out.write(map.key())
+        template_values = {
+            'map': map,
+        }
+        
+        #self.response.out.write(self.generate('index.html',template_values))
+        #self.response.out.write(simplejson.dumps(photo.title))
+        self.response.out.write(photo.key())
+
         
 class MapImage(webapp.RequestHandler):
     def get(self):
@@ -149,6 +181,18 @@ class MapImage(webapp.RequestHandler):
         if map.file:
             self.response.headers['Content-Type'] = "image"
             self.response.out.write(map.file)
+        else:
+            self.response.out.write("No image")
+            
+class PingPhoto(webapp.RequestHandler):
+    def get(self):
+        user = users.get_current_user()
+
+        photo = db.get(self.request.get("key"))
+        
+        if photo.file:
+            self.response.headers['Content-Type'] = "image"
+            self.response.out.write(photo.file)
         else:
             self.response.out.write("No image")
                         
@@ -286,6 +330,9 @@ class RPCHandler(webapp.RequestHandler):
     
     self.response.out.write(simplejson.dumps(result))
 
+
+    
+    
 class RPCMethods:
     """ Defines the methods that can be RPCed.
     NOTE: Do not allow remote callers access to private/protected "_*" methods.
@@ -422,11 +469,13 @@ class RPCMethods:
 application = webapp.WSGIApplication([('/', MainPage),
                                       ('/upload_map', UploadMap),
                                       ('/map_image', MapImage),
+                                      ('/ping_photo', PingPhoto),
                                       ('/drop_map', DropMap),
                                       ('/update_map', UpdateMap),
                                       ('/qr_all', QRAll),
                                       ('/qr_single', QRSingle),
                                       ('/show', ShowJson),
+                                      ('/upload_image', UploadImage),
                                       ('/rpc', RPCHandler)],
                                      debug=True)
 
