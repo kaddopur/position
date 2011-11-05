@@ -103,7 +103,7 @@
                     var cell = row.insertCell(-1); //td
                     cell.innerHTML = title_list[i];
                     var cellButton = row.insertCell(-1);
-                    cellButton.innerHTML = '<input type="image" src="image/icons/delete_button.png" alt="Delete" width="20" height="20" align="RIGHT" onclick="event.cancelBubble=true;doDeletePingAjax();" >';
+                    cellButton.innerHTML = '<input type="image" src="image/icons/delete_button.png" alt="Delete" width="20" height="20" align="RIGHT" onclick="event.cancelBubble=true;doDeletePointAjax();" >';
 					if (i != index){
 						shiftzoom.construct( img, [{id: Points[i][2],
 							                        x: Points[i][0], 
@@ -145,7 +145,7 @@
             var eNow
 			
             function setTimer(e){
-                timer=setTimeout(function(){doAddPingAjax(e);},500);    
+                timer=setTimeout(function(){doAddPointAjax(e);},500);    
 			}
             
             
@@ -233,14 +233,14 @@
             
 
             /*
-             *  ajax by JQuery.form api  ( still working)
+             *  ajax by JQuery.form api
              */
             $(document).ready(function() { 
                 // bind 'myForm' and provide a simple callback function
                 var body = document.getElementById('body');
                 var options = {
                     type:       "POST",
-                    success:     onUploadMapSuccess  // post-submit callback 
+                    success:     onUploadMapSuccess,  // post-submit callback 
                 };
                 $('#map_profile').ajaxForm();
                 $('#mapForm').ajaxForm(options);
@@ -262,7 +262,6 @@
                 } catch (e) {
                  response = responseText;
                 }
-                
                 if( _debug){
                     alert( responseText);
                 }
@@ -308,8 +307,8 @@
                     document.getElementById('update_map').onclick = function(){updateMapAjax();};
                     document.getElementById('delete_map').onclick = function(){deleteMapAjax();};
                     document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
-                    document.getElementById('update_point').onclick = function(){doUpdatePingAjax();};
-                    document.getElementById('delete_point').onclick = function(){doDeletePingAjax();};
+                    document.getElementById('update_point').onclick = function(){doUpdatePointAjax();};
+                    document.getElementById('delete_point').onclick = function(){doDeletePointAjax();};
                 }
             }
             function getStyle(el,styleProp)
@@ -326,9 +325,9 @@
              *  ajax based on XMLHttpRequest implemented ourself
              */
             var server = {};
-            InstallFunction(server, 'addPingAjax');
-            InstallFunction(server, 'deletePingAjax');
-            InstallFunction(server, 'updatePingAjax');
+            InstallFunction(server, 'addPointAjax');
+            InstallFunction(server, 'deletePointAjax');
+            InstallFunction(server, 'updatePointAjax');
             InstallFunction(server, 'syncWithDB');
             
             function InstallFunction(obj, name) {
@@ -354,7 +353,7 @@
                 refreshMap(response);
             }
             
-            function doUpdatePingAjax(){
+            function doUpdatePointAjax(){
                 if ( _Points.length <=0)
                     return;
                 var title = document.getElementById('point_title');
@@ -362,20 +361,20 @@
 				var id = document.getElementById('point_id');
                 var photo_key =  document.getElementById('photo_key');
                 
-                server.updatePingAjax(_map_key, id.value, title.value, desc.value, photo_key.value, onUpdateSuccess);
+                server.updatePointAjax(_map_key, id.value, title.value, desc.value, photo_key.value, onUpdateSuccess);
             }
             
             function onDeleteSuccess(response){
                 refreshMap(response);
             }
             
-            function doDeletePingAjax(){
+            function doDeletePointAjax(){
                 if ( _Points.length <=0)
                     return;
                 var title = document.getElementById('point_title');
 				var id = document.getElementById('point_id');
                 if (confirm("確定要刪除此定位點【" + title.value + "】？")){
-                    server.deletePingAjax(_map_key, id.value, onDeleteSuccess);
+                    server.deletePointAjax(_map_key, id.value, onDeleteSuccess);
 				}
             }
             
@@ -384,7 +383,7 @@
             }
             
             
-            function doAddPingAjax(e) {
+            function doAddPointAjax(e) {
 
                 if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5){
                     return;
@@ -403,7 +402,7 @@
                 x=parseInt(relX/(p.z*(zoomX-1)+100)*100+p.x/100*imgWidth*(1-100/(p.z*(zoomX-1)+100)))
                 y=parseInt(relY/(p.z*(zoomY-1)+100)*100+p.y/100*imgHeight*(1-100/(p.z*(zoomY-1)+100)));
                 
-                server.addPingAjax(_map_key, x.toString(), y.toString(),onAddSuccess);
+                server.addPointAjax(_map_key, x.toString(), y.toString(),onAddSuccess);
             }
             
             function Request(function_name, opt_argv) {
@@ -513,8 +512,8 @@
                 }
                 else{                    
                     var imgTag = document.createElement("img");
-                    imgTag.id = "ping_photo";
-                    imgTag.src = "/ping_photo?key="+photo_key;
+                    imgTag.id = "point_photo";
+                    imgTag.src = "/point_photo?key="+photo_key;
                     imgTag.style.width = "100%";
                     imgTag.style.height = "100%";
                     
@@ -666,8 +665,8 @@
                                 //data = _Points;
 								//if(data.length > 0){
 									document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
-									document.getElementById('update_point').onclick = function(){doUpdatePingAjax();};
-									document.getElementById('delete_point').onclick = function(){doDeletePingAjax();};
+									document.getElementById('update_point').onclick = function(){doUpdatePointAjax();};
+									document.getElementById('delete_point').onclick = function(){doDeletePointAjax();};
 								//}
 							</script>
 						{% endif %}

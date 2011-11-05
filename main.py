@@ -140,10 +140,14 @@ class UploadMap(BaseRequestHandler):
 class UploadPhoto(BaseRequestHandler):
     def post(self):
         user = users.get_current_user()
-     
-        photo = PointPhoto()
-        
         map = db.get(self.request.get("map_key"))
+        point_id = self.request.get('point_id')
+        
+        query = PointPhoto.all()
+        query.filter('map_id =', map.map_id).filter('point_id =', point_id)
+        db.delete(query)
+                
+        photo = PointPhoto()
         photo.map_id = map.map_id
         photo.point_id = int(self.request.get('point_id'))
         img = self.request.get('files[]')
@@ -181,7 +185,7 @@ class MapImage(webapp.RequestHandler):
         else:
             self.response.out.write("No image")
             
-class PingPhoto(webapp.RequestHandler):
+class PointPhotoImage(webapp.RequestHandler):
     def get(self):
         user = users.get_current_user()
 
@@ -200,8 +204,12 @@ class DropMap(BaseRequestHandler):
         #delete all points related to this map
         query = Point.all()
         query.filter('map_id =', map.map_id)
-        results = query.fetch(1000)
-        db.delete(results)
+        db.delete(query)
+        
+        #delete all Photos related to this map
+        query2 = PointPhoto.all()
+        query2.filter('map_id =', map.map_id)
+        db.delete(query2)
         
         #delete this map
         db.delete(map)
@@ -365,9 +373,9 @@ class RPCMethods:
         template_values.update(values)
         return template_values
         
-    def addPingAjax(self, *args):
+    def addPointAjax(self, *args):
         
-        #add new ping into database
+        #add new point into database
         mapkey = args[0]
         x = args[1]
         y = args[2]
@@ -398,7 +406,7 @@ class RPCMethods:
         
         return self.__template( values)
         
-    def updatePingAjax(self, *args):
+    def updatePointAjax(self, *args):
         mapkey = args[0]
         point_id = args[1]
         title = args[2]
@@ -421,7 +429,7 @@ class RPCMethods:
         
         return self.__template( values)
         
-    def deletePingAjax(self, *args):
+    def deletePointAjax(self, *args):
         mapkey = args[0]
         point_id = args[1]
         
@@ -443,7 +451,7 @@ class RPCMethods:
 application = webapp.WSGIApplication([('/', MainPage),
                                       ('/upload_map', UploadMap),
                                       ('/map_image', MapImage),
-                                      ('/ping_photo', PingPhoto),
+                                      ('/point_photo', PointPhotoImage),
                                       ('/drop_map', DropMap),
                                       ('/update_map', UpdateMap),
                                       ('/qr_all', QRAll),
