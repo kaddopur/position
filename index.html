@@ -23,31 +23,51 @@
         <script src="/script/fileuploader.js" type="text/javascript"></script>
 
         <script>
+            
             _debug = false;
             _map_key = "{{map.key}}";
             _Points = {{point_data}};
             _title_list = {{ point_titles }};
             _desc_list = {{ point_descriptions }};
             _point_id = 0;
-            /*************************************************************/
+            _photo_list = {{ point_photos}};
+            
+            
+            $(document).ready(function(){
+                setDropUpload();
+            });
+            
+
+            /*
+             *  tracking mouse
+             */
+            
+            $(document).ready(function(){
+               $(document).mousemove(function(e){
+                  //$('#xlInput').val(e.pageX +', '+ e.pageY);
+                  eNow = e;
+               });
+            })
+            
+
             /*
              *  reloading Points
              */
-            function setName(index){
-                if (index < 0) return;
+            function setIndex(index){
+                //if (index < 0) return;
                 var Points = _Points;
 				var title_list = _title_list;
 				var desc_list = _desc_list;
-                reloadElement( index, Points, title_list, desc_list);
+                var photo_list = _photo_list;
+                reloadElement( index, Points, title_list, desc_list, photo_list);
 			}
 
-            function reloadElement(index,Points, title_list, desc_list){
+            function reloadElement(index,Points, title_list, desc_list, photo_list){
                 
                 var img = document.getElementById("map1");	
 				var title = document.getElementById('point_title');
 				var desc = document.getElementById('point_description');
 				var id = document.getElementById('point_id');
-                var point_list = Points
                 if ( _debug)
                     alert(index+" / "+ Points.length);
 
@@ -57,11 +77,13 @@
                     _point_id = Points[index][2];
                     title.value = title_list[index];
                     desc.value = desc_list[index];
+                    updatePhoto( photo_list[index]);
                 }
                 else{
                     id.value = 0;
                     title.value = '';
                     desc.value = '';
+                    updatePhoto();
                 }
 				
                 title.focus();
@@ -73,8 +95,8 @@
                 for(var i in Points){
                     // refresh navTable
                     var row = navTable.insertRow(-1); // tr
-                    //row.onclick = function(){setName( i );};
-                    row.setAttribute("onclick", "javascript:setName( "+i+ ");");
+                    //row.onclick = function(){setIndex( i );};
+                    row.setAttribute("onclick", "javascript:setIndex( "+i+ ");");
                     row.setAttribute("onmousemove", "javascript:setIcon( "+i+ ");");
                     row.setAttribute("onmouseout", "javascript:unsetIcon( "+i+ ");");
                     row.id = "nav_"+(Points[i][2])
@@ -90,7 +112,7 @@
 													h: 45,
 													pos: 8,
 													title: title_list[i], 
-													href: 'javascript:setName('+i+')', 
+													href: 'javascript:setIndex('+i+')', 
 													src: 'image/icons/marker_pink.png', 
 													src2: 'image/icons/marker_pink_hover.png'}]);
 						document.getElementById("nav_" + Points[i][2]).style.backgroundColor="#fafafa";
@@ -115,7 +137,7 @@
 			}
 
             
-            /*************************************************************/
+
             /*
              *  set timer to detect mouse event
              */
@@ -123,18 +145,15 @@
             var eNow
 			
             function setTimer(e){
-                timer=setTimeout(function(){doAddPingAjax(e);},1000);    
+                timer=setTimeout(function(){doAddPingAjax(e);},500);    
 			}
+            
             
             function clearTimer(){
                 clearTimeout(timer);
 			}
 
-            function trackMouse(e){
-                eNow=e;
-			}
-
-			
+		
             
             function setIcon(index){
                 var point_list = _Points;
@@ -159,17 +178,23 @@
             
             
             
-            /*************************************************************/
+
             /*
              *  ajax by JQuery
              */
             function deleteMapAjax(){
 				if( _map_key.length){
-                    if (confirm("確定要刪除此地圖及所有定位點？"+_map_key+"??")){
-                        var body = document.getElementById('body');
-                        body.innerHTML = $.ajax({
+                    if (confirm("確定要刪除此地圖及所有定位點？")){
+                        var xlInput = document.getElementById('xlInput');
+                        xlInput.value = "";
+                        var qr_all = document.getElementById('qr_all');
+                        qr_all.href = "";
+                        var body = document.getElementById('mapArea');
+                        mapArea.innerHTML = '<form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post"><div><input id="mapUpload" type="file" name="img"/></div><div><input id="submitButton" type="button" onclick="uploadMap();" value="上傳地圖"></div></form>';
+                        //body.innerHTML = 
+                        $.ajax({
                               url: "/drop_map",
-                              global: false,
+                              global: true,
                               type: "POST",
                               data: {key : _map_key},
                               dataType: "html",
@@ -184,6 +209,8 @@
                         _Points = [];
                         _title_list = [];
                         _desc_list = [];
+                        _photo_list = [];
+                        setIndex(-1);
                     }
                 }
 			}
@@ -204,7 +231,7 @@
                 }
             }
             
-            /*************************************************************/
+
             /*
              *  ajax by JQuery.form api  ( still working)
              */
@@ -222,36 +249,79 @@
                 // submit the form 
                 var options = {
                     type:       "POST",
-                    success:     onUploadMapSuccess  // post-submit callback 
+                    success:    onUploadMapSuccess,  // post-submit callback 
                 };
                 $('#mapForm').ajaxSubmit(options); 
                 // return false to prevent normal browser submit and page navigation 
                 return false; 
             }
-            
             function onUploadMapSuccess(responseText, statusText, xhr, $form)  { 
-                var mapArea = document.getElementById('mapArea');
+                var response = null;
+                try {
+                 response = JSON.parse(responseText);
+                } catch (e) {
+                 response = responseText;
+                }
                 
-                console.log(mapArea);
-                if ( _debug)
-                    alert('xxstatus: ' + statusText + '\n\nresponseText: \n' + responseText + '\n\nThe output div should have already been updated with the responseText.');
-                //body.innerHTML = responseText;
-                mapArea.innerHTML = '<div id="back" onmousemove="trackMouse(event);" onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key='+responseText+'" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});setName(findIndex());" style="width: 100%; height: 100%;"></div>';
-                _map_key = responseText;
-                _Points = [];
-                _title_list = [];
-                _desc_list = [];
-                
-                document.getElementById('map_profile').key.value = _map_key;
-                document.getElementById('update_map').onclick = function(){updateMapAjax();};
-                document.getElementById('delete_map').onclick = function(){deleteMapAjax();};
-                document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
-                document.getElementById('update_point').onclick = function(){doUpdatePingAjax();};
-                document.getElementById('delete_point').onclick = function(){doDeletePingAjax();};
-                return false;
+                if( _debug){
+                    alert( responseText);
+                }
+                if( response.success == "false" ){
+                    alert( response.message);
+                }
+                else{
+
+                    _map_key = response.map_key;
+                    _Points = [];
+                    _title_list = [];
+                    _desc_list = [];
+                    _photo_list = [];
+                    var mapArea = document.getElementById('mapArea');
+                    
+                    var qr_all = document.getElementById('qr_all');
+                    qr_all.href = "/qr_all?key="+_map_key;
+                    
+                    while ( mapArea.childNodes.length > 0){
+                        mapArea.removeChild( mapArea.lastChild);
+                    }
+                    var divTag = document.createElement("div");
+                    var imgTag = document.createElement("img");
+                    
+                    divTag.id = "back";
+                    divTag.onmouseup = function(){ clearTimer();};
+                    divTag.onmousedown = function(e){ setTimer(e);};
+                    
+                    imgTag.id = "map1";
+                    imgTag.alt = "地圖";
+                    imgTag.src = "/map_image?key=" + _map_key;
+                    imgTag.onload = function(){                        
+                        shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});
+                        setIndex(findIndex());
+                    };          
+                    imgTag.style.width = "100%";
+                    imgTag.style.height = "100%";
+                    
+                    divTag = mapArea.appendChild( divTag);
+                    imgTag = divTag.appendChild( imgTag);
+                    
+                    document.getElementById('map_profile').key.value = _map_key;
+                    document.getElementById('update_map').onclick = function(){updateMapAjax();};
+                    document.getElementById('delete_map').onclick = function(){deleteMapAjax();};
+                    document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
+                    document.getElementById('update_point').onclick = function(){doUpdatePingAjax();};
+                    document.getElementById('delete_point').onclick = function(){doDeletePingAjax();};
+                }
             }
-            
-            /*************************************************************/
+            function getStyle(el,styleProp)
+            {
+                var x = document.getElementById(el);
+                if (x.currentStyle) // IE model
+                    var y = x.currentStyle[styleProp];
+                else if (window.getComputedStyle) // FF & Opera model
+                    var y = document.defaultView.getComputedStyle(x,null).getPropertyValue(styleProp);
+                return y;
+            }
+
             /*
              *  ajax based on XMLHttpRequest implemented ourself
              */
@@ -267,15 +337,16 @@
             
             function refreshMap(response){
                 index = findIndexOf(response.point_id,response.point_data);
+                
                 // refresh data in js
                 _Points = response.point_data;
 				_title_list = response.point_titles;
 				_desc_list = response.point_descriptions;
-                
+                _photo_list = response.point_photos;
+                _point_id = response.point_id;
                 // sync the Map with databse
                 document.getElementById('point_id').value = response.point_id;
-                _point_id = response.point_id;
-                reloadElement(index, response.point_data, response.point_titles, response.point_descriptions);
+                reloadElement(index, response.point_data, response.point_titles, response.point_descriptions, response.point_photos);
             }
             
             
@@ -289,8 +360,9 @@
                 var title = document.getElementById('point_title');
 				var desc = document.getElementById('point_description');
 				var id = document.getElementById('point_id');
+                var photo_key =  document.getElementById('photo_key');
                 
-                server.updatePingAjax(_map_key, id.value, title.value, desc.value, onUpdateSuccess);
+                server.updatePingAjax(_map_key, id.value, title.value, desc.value, photo_key.value, onUpdateSuccess);
             }
             
             function onDeleteSuccess(response){
@@ -380,7 +452,7 @@
               // Make the actual request
               req.send(null);
             }
-            /*************************************************************/
+
             /*
              *  other utils
              */
@@ -429,10 +501,67 @@
 					}
 				}
 			}
-            /*************************************************************/
-            /*
-             *  upload image
-             */
+            
+            function updatePhoto( photo_key){
+                drag_area = document.getElementById('drag_upload');
+                while( drag_area.childNodes.length > 0){
+                    drag_area.removeChild( drag_area.lastChild);
+                }
+                if( photo_key == null){
+                    drag_area.innerHTML = "將圖檔拖入此區";
+                    drag_area.style.padding = "51px 0";
+                }
+                else{                    
+                    var imgTag = document.createElement("img");
+                    imgTag.id = "ping_photo";
+                    imgTag.src = "/ping_photo?key="+photo_key;
+                    imgTag.style.width = "100%";
+                    imgTag.style.height = "100%";
+                    
+                    var inputTag = document.createElement("input");
+                    inputTag.id = "photo_key";
+                    inputTag.type = "hidden";
+                    inputTag.value = photo_key;
+                    
+                    drag_area.appendChild( inputTag);
+                    drag_area.appendChild( imgTag);
+                    
+                    drag_area.style.padding = "0";
+                }
+            }
+            function setDropUpload(){
+                point_id = document.getElementById('point_id');
+                map_key = _map_key;
+                
+                $('#fileupload').fileupload({
+                    dataType: 'text',
+                    url: '/upload_photo',
+                    dropZone: $('#drag_upload'),
+                    done: function (e, data) {
+                        updatePhoto( data.result);
+                        /*
+                        $.each(data.result, function (index, file) {
+                            alert('Done file: ' + file.name + ' result:' + data.result);
+                            return;
+                            //$('<p/>').text(file.name).appendTo('body');
+                        });*/
+                    },
+                    send: function( e, data){
+                        if( undefined == _map_key || _map_key.length <=0 || _point_id <= 0){
+                            return false;
+                        }
+                    },
+                    drop: function (e, data) {
+                        //$.each(data.files, function (index, file) {
+                            if( _debug)
+                                alert('Dropped file: ' + file.name);
+                            data.formData = {point_id: _point_id, map_key: _map_key};
+                            alert( _point_id);
+                        //});
+                    }                    
+                });
+            }
+
                             
         </script>
     </head>
@@ -447,9 +576,9 @@
                     <ul>
                         <li>
                         {% if map %}
-                            <a href="/qr_all?key={{ map.key }}">輸出圖資</a>
+                            <a id="qr_all" href="/qr_all?key={{ map.key }}">輸出圖資</a>
                         {% else %}
-                            <a>輸出圖資</a>
+                            <a id="qr_all">輸出圖資</a>
                         {% endif %}
                         </li> 
                         <li><a href="{{ logout_url }}">登出</a></li> 
@@ -474,7 +603,7 @@
             <div class="row show-grid">
                 <form id="map_profile" action="/update_map" enctype="multipart/form-data" method="get">
                     <div class="span12 column">
-                        <input class="xlarge" id="xlInput" name="title" type="text" value="{{ map.title}}" style="margin: 0; padding: 0; width: 100%; height: 100%;" placeholder="地圖標題"/>
+                        <input class="xlarge" id="xlInput" name="title" type="text" value="{{ map.title}}" style="margin: 0; padding: 0; width: 100%; height: 100%;" placeholder="地圖標題" onmouseup=this.select() />
                         <input type="hidden" name="key" value="{{ map.key }}">
                     </div>
                     {% if map %}
@@ -498,7 +627,7 @@
             <div class="row"> 
                 <div id=mapArea class="span12 round" style="padding: 0; height: 400px;">
                     {% if map %}
-                        <div id="back" onmousemove="trackMouse(event);" onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});setName(findIndex());" style="width: 100%; height: 100%;"></div>
+                        <div id="back"  onmouseup="clearTimer();" onmousedown="setTimer(event);" ><img id="map1" src="/map_image?key={{map.key}}" onLoad="shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});setIndex(findIndex());" style="width: 100%; height: 100%;"></div>
                     {% else %}
                         <form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post">
                             <div><input id="mapUpload" type="file" name="img"/></div>
@@ -511,7 +640,7 @@
                     <table id="navTable" class="common-table zebra-striped">
                         <!--
                         {% for point in points%}
-						<tr><td onClick="setName({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}"><img src="image/icons/delete_button.png" alt="Delete" width="30" height="30" align="RIGHT" />{{point.title}}</td>
+						<tr><td onClick="setIndex({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}"><img src="image/icons/delete_button.png" alt="Delete" width="30" height="30" align="RIGHT" />{{point.title}}</td>
                             
                         </tr>
                         {% endfor %}
@@ -524,7 +653,7 @@
                 <div class="span16 column">
                     <div style="float: left; width: 30%; height: 150px;">
                         <div class="input" style="margin-bottom: 25px;"> 
-							<input class="xlarge" placeholder="地點名稱" id="point_title" name="xlInput" size="35" type="text" />
+							<input class="xlarge" placeholder="地點名稱" id="point_title" name="xlInput" size="35" type="text" onmouseup=this.select() />
 							
                         </div>
 
@@ -548,7 +677,7 @@
 
                     <div style="float: left; width: 400px; height: 150px;">
                         <div class="input"> 
-                            <textarea class="xxlarge" id="point_description" name="textarea" style="width: 100%; height: 80%"></textarea> 
+                            <textarea class="xxlarge" id="point_description" name="textarea" style="width: 100%; height: 80%" onmouseup=this.select()></textarea> 
                             <span class="help-block"> 
                                 請輸入此地點的詳細描述
 						
@@ -556,51 +685,11 @@
 						</div> 
                     </div>
                     
-                    <div id="temp" style="float: right; width: 240px; height: 125px;">
+                    <div id="temp" style="float: right; width: 240px; height: 119px;">
                         <div  name="drag_upload" id="drag_upload" class="input" style="border: 1px #aaa dotted; margin: 0 40px 40px 0; padding: 50px 0; text-align: center;">
                             <input id="fileupload" type="hidden" type="file" name="files[]" multiple>
                             <script>
-                            $(function () {
-                            document.getElementById('point_id')
-                                point_id = document.getElementById('point_id');
-                                map_key = _map_key;
-                                
-                                $('#fileupload').fileupload({
-                                    dataType: 'text',
-                                    url: '/upload_image',
-                                    dropZone: $('#drag_upload'),
-                                    done: function (e, data) {
-                                        drag_area = document.getElementById('drag_upload');
-                                        drag_area.innerHTML = '<img id="ping_photo" src="/ping_photo?key='+data.result+'" style="width: 100%; height: 100%;">';
-                                        drag_area.style.padding = "0";                    
-                                        /*
-                                        $.each(data.result, function (index, file) {
-                                            alert('Done file: ' + file.name + ' result:' + data.result);
-                                            return;
-                                            //$('<p/>').text(file.name).appendTo('body');
-                                        });*/
-                                    },
-                                    fail: function (e, data) {
-                                        $.each(data.result, function (index, file) {
-                                            alert('fail file: ' + file.name);
-                                            //$('<p/>').text(file.name).appendTo('body');
-                                        });
-                                    },
-                                    drop: function (e, data) {
-                                        $.each(data.files, function (index, file) {
-                                            if( _debug)
-                                                alert('Dropped file: ' + file.name);
-                                            data.formData = {point_id: _point_id, map_key: _map_key};
-                                        });
-                                    },
-                                    change: function (e, data) {
-                                        $.each(data.files, function (index, file) {
-                                            alert('Selected file: ' + file.name);
-                                        });
-                                    }
-                                    
-                                });
-                            });
+                            
                             </script>
                             </form>
                             將圖檔拖入此區

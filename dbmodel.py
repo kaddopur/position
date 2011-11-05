@@ -16,6 +16,7 @@ class Point(db.Model):
     x = db.IntegerProperty()
     y = db.IntegerProperty()
     date = db.DateTimeProperty(auto_now_add=True)
+    photo_key = db.StringProperty();
     
 class PointPhoto(db.Model):
     map_id = db.IntegerProperty()

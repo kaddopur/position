@@ -40,7 +40,7 @@ class BaseRequestHandler(webapp.RequestHandler):
      in response to a web request
   """
 
-  def generate(self, template_name, template_values={'shit':'toooooshit'}):
+  def generate(self, template_name, template_values):
     """Generate takes renders and HTML template along with values
        passed to that template
 
@@ -67,12 +67,14 @@ class BaseRequestHandler(webapp.RequestHandler):
     point_data = []
     point_titles = []
     point_descriptions = []
+    point_photos = []
     if map:
         point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
         if point_results:
             point_data = [(point.x, point.y, point.point_id) for point in point_results]
             point_titles = [(point.title) for point in point_results]
             point_descriptions = [(point.description) for point in point_results]
+            point_photos = [(point.photo_key) for point in point_results]
         
     values = {
         'user' : user,
@@ -82,16 +84,10 @@ class BaseRequestHandler(webapp.RequestHandler):
         'point_titles': simplejson.dumps(point_titles),
         'point_descriptions': simplejson.dumps(point_descriptions),
         'points': point_results,
-        'shit' : 'notshit',
+        'point_photos': simplejson.dumps(point_photos),
     }
     values.update(template_values)
     ###
-    
-    print values
-    print values
-    print values
-    print values
-    print values
     
     # Construct the path to the template
     directory = os.path.dirname(__file__)
@@ -121,25 +117,27 @@ class UploadMap(BaseRequestHandler):
         map.title = ''
         img = self.request.get("img")
         map.file = db.Blob(str(img))
-        map.put()
-        seed = user
-        #map.key = KEY( user + str(map.map_id) + str(map.map_ver))
-        
-        
-        map = Map.all().filter('author =', user).order('-date').get();
+        if (images.Image(image_data=map.file).width < 700) or (images.Image(image_data=map.file).height < 400):
+            template_values = {
+                'success': "false",
+                'message': "ERROR: Image must be at least 700px X 500px",
+                'map_key': "",
+            }
+            self.response.clear()
+            self.response.out.write(simplejson.dumps(template_values))
+        else:
+            map.put()
+            seed = user
+            map = Map.all().filter('author =', user).order('-date').get()
+            template_values = {
+                'success': "true",
+                'message': "successful upload",
+                'map_key': str(map.key()),
+            }
+            self.response.clear()
+            self.response.out.write(simplejson.dumps(template_values))
 
-        #path = os.path.join(os.path.dirname(__file__), 'index.html')
-        #self.response.out.write(template.render(path, template_values))
-        #self.response.headers['Content-Type'] = "image"
-        #self.response.out.write(map.key())
-        template_values = {
-            'map': map,
-        }
-        
-        #self.response.out.write(self.generate('index.html',template_values))
-        self.response.out.write(map.key())
-
-class UploadImage(BaseRequestHandler):
+class UploadPhoto(BaseRequestHandler):
     def post(self):
         user = users.get_current_user()
      
@@ -151,7 +149,6 @@ class UploadImage(BaseRequestHandler):
         img = self.request.get('files[]')
         photo.file = db.Blob(str(img))
         photo.title = self.request.get("point_id")
-        
         photo.put()
         #seed = user
         #map.key = KEY( user + str(map.map_id) + str(map.map_ver))
@@ -212,8 +209,7 @@ class DropMap(BaseRequestHandler):
             'map': None,
         }
         self.response.out.write( self.generate('index.html',template_values))
-        
-        #self.redirect('/')
+        self.redirect('/')
         
 class UpdateMap(webapp.RequestHandler):
     def get(self):
@@ -278,6 +274,9 @@ class ShowJson(webapp.RequestHandler):
         query.filter('map_ver =', int(self.request.get('mapVer')))
         map = query.get()
         
+        
+
+        
         if map:
             point_result = Point.all().filter('map_id =', int(self.request.get('mapID'))).fetch(1000)
             points = []
@@ -337,7 +336,35 @@ class RPCMethods:
     """ Defines the methods that can be RPCed.
     NOTE: Do not allow remote callers access to private/protected "_*" methods.
     """
-   
+    def __template(self, values):
+        # prepare return data
+        user = users.get_current_user()
+        if not user:
+            self.error(404)
+        map = Map.all().filter('author =', user).order('-date').get()
+        point_results = []
+        point_data = []
+        point_titles = []
+        point_descriptions = []
+        point_photos = []
+        if map:
+            point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
+            if point_results:
+                point_data = [(point.x, point.y, point.point_id) for point in point_results]
+                point_titles = [(point.title) for point in point_results]
+                point_descriptions = [(point.description) for point in point_results]
+                point_photos = [(point.photo_key) for point in point_results]
+            
+        template_values = {
+            'point_id': 0,
+            'point_data': point_data,
+            'point_titles': point_titles,
+            'point_descriptions': point_descriptions,
+            'point_photos': point_photos,
+        }
+        template_values.update(values)
+        return template_values
+        
     def addPingAjax(self, *args):
         
         #add new ping into database
@@ -365,68 +392,34 @@ class RPCMethods:
         point.put()
         map.put()       
         
-        # prepare return data
-        user = users.get_current_user()
-        if not user:
-            self.error(404)
-        map = Map.all().filter('author =', user).order('-date').get()
-        point_results = []
-        point_data = []
-        point_titles = []
-        point_descriptions = []
-        if map:
-            point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
-            if point_results:
-                point_data = [(point.x, point.y, point.point_id) for point in point_results]
-                point_titles = [(point.title) for point in point_results]
-                point_descriptions = [(point.description) for point in point_results]
-            
-        template_values = {
-            'point_id':point_id,
-            'point_data': point_data,
-            'point_titles': point_titles,
-            'point_descriptions': point_descriptions,
+        values = {
+            'point_id': point_id,
         }
-        return template_values
+        
+        return self.__template( values)
         
     def updatePingAjax(self, *args):
         mapkey = args[0]
         point_id = args[1]
         title = args[2]
         desc = args[3]
-        
+        photo_key = args[4]
+
         map = db.get(mapkey)
         map.map_ver = map.map_ver + 1
         
         point = Point.all().filter('map_id = ', map.map_id).filter('point_id =', int(point_id)).get()
         point.title = title
         point.description = desc
+        point.photo_key = photo_key
         point.put()
         map.put()
         
-        # prepare return data
-        user = users.get_current_user()
-        if not user:
-            self.error(404)
-        map = Map.all().filter('author =', user).order('-date').get()
-        point_results = []
-        point_data = []
-        point_titles = []
-        point_descriptions = []
-        if map:
-            point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
-            if point_results:
-                point_data = [(point.x, point.y, point.point_id) for point in point_results]
-                point_titles = [(point.title) for point in point_results]
-                point_descriptions = [(point.description) for point in point_results]
-            
-        template_values = {
+        values = {
             'point_id': point_id,
-            'point_data': point_data,
-            'point_titles': point_titles,
-            'point_descriptions': point_descriptions,
         }
-        return template_values
+        
+        return self.__template( values)
         
     def deletePingAjax(self, *args):
         mapkey = args[0]
@@ -439,30 +432,11 @@ class RPCMethods:
         point.delete()
         map.put()
         
-        # prepare return data
-        user = users.get_current_user()
-        if not user:
-            self.error(404)
-        map = Map.all().filter('author =', user).order('-date').get()
-        point_results = []
-        point_data = []
-        point_titles = []
-        point_descriptions = []
-        if map:
-            point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
-            if point_results:
-                point_data = [(point.x, point.y, point.point_id) for point in point_results]
-                point_titles = [(point.title) for point in point_results]
-                point_descriptions = [(point.description) for point in point_results]
-
-        template_values = {
+        values = {
             'point_id': 0,
-            'point_data': point_data,
-            'point_titles': point_titles,
-            'point_descriptions': point_descriptions,
         }
         
-        return template_values
+        return self.__template( values)
      
   
     
@@ -475,7 +449,7 @@ application = webapp.WSGIApplication([('/', MainPage),
                                       ('/qr_all', QRAll),
                                       ('/qr_single', QRSingle),
                                       ('/show', ShowJson),
-                                      ('/upload_image', UploadImage),
+                                      ('/upload_photo', UploadPhoto),
                                       ('/rpc', RPCHandler)],
                                      debug=True)
 
