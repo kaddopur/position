@@ -53,8 +53,6 @@ class BaseRequestHandler(webapp.RequestHandler):
     # We check if there is a current user and generate a login or logout URL
     user = users.get_current_user()
 
-
-    ###
     if not user:
         self.redirect(users.create_login_url(self.request.uri))
         
@@ -87,7 +85,6 @@ class BaseRequestHandler(webapp.RequestHandler):
         'point_photos': simplejson.dumps(point_photos),
     }
     values.update(template_values)
-    ###
     
     # Construct the path to the template
     directory = os.path.dirname(__file__)
@@ -100,9 +97,7 @@ class MainPage(BaseRequestHandler):
     def get(self):
         
         self.response.out.write( self.generate('index.html',{}))
-        #path = os.path.join(os.path.dirname(__file__), 'index.html')
-        #self.response.out.write(template.render(path, template_values))
-       
+        
 class UploadMap(BaseRequestHandler):
     def post(self):
         user = users.get_current_user()
@@ -131,7 +126,7 @@ class UploadMap(BaseRequestHandler):
             map = Map.all().filter('author =', user).order('-date').get()
             template_values = {
                 'success': "true",
-                'message': "successful upload",
+                'message': "successful upload map",
                 'map_key': str(map.key()),
             }
             self.response.clear()
@@ -154,23 +149,13 @@ class UploadPhoto(BaseRequestHandler):
         photo.file = db.Blob(str(img))
         photo.title = self.request.get("point_id")
         photo.put()
-        #seed = user
-        #map.key = KEY( user + str(map.map_id) + str(map.map_ver))
-        
-        
-        #map = Map.all().filter('author =', user).order('-date').get();
-
-        #path = os.path.join(os.path.dirname(__file__), 'index.html')
-        #self.response.out.write(template.render(path, template_values))
-        #self.response.headers['Content-Type'] = "image"
-        #self.response.out.write(map.key())
         template_values = {
-            'map': map,
+            'success': "true",
+            'message': "successful upload photo",
+            'photo_key': str(photo.key()),
         }
-        
-        #self.response.out.write(self.generate('index.html',template_values))
-        #self.response.out.write(simplejson.dumps(photo.title))
-        self.response.out.write(photo.key())
+        self.response.clear()
+        self.response.out.write(simplejson.dumps(template_values))
 
         
 class MapImage(webapp.RequestHandler):
@@ -217,7 +202,7 @@ class DropMap(BaseRequestHandler):
             'map': None,
         }
         self.response.out.write( self.generate('index.html',template_values))
-        self.redirect('/')
+
         
 class UpdateMap(webapp.RequestHandler):
     def get(self):
@@ -225,8 +210,7 @@ class UpdateMap(webapp.RequestHandler):
         map.title = self.request.get("title")
         map.map_ver = map.map_ver + 1
         map.put()
-        
-        self.redirect('/')
+
         
         
 class QRAll(webapp.RequestHandler):
@@ -281,10 +265,7 @@ class ShowJson(webapp.RequestHandler):
         query.filter('map_id =', int(self.request.get('mapID')))
         query.filter('map_ver =', int(self.request.get('mapVer')))
         map = query.get()
-        
-        
 
-        
         if map:
             point_result = Point.all().filter('map_id =', int(self.request.get('mapID'))).fetch(1000)
             points = []
@@ -338,12 +319,11 @@ class RPCHandler(webapp.RequestHandler):
     self.response.out.write(simplejson.dumps(result))
 
 
-    
-    
 class RPCMethods:
     """ Defines the methods that can be RPCed.
     NOTE: Do not allow remote callers access to private/protected "_*" methods.
     """
+    #private method __template
     def __template(self, values):
         # prepare return data
         user = users.get_current_user()
@@ -393,7 +373,7 @@ class RPCMethods:
         if largest_point:
             point_id = largest_point.point_id + 1
             point.point_id = largest_point.point_id + 1
-        point.title = (u'新定位點')
+        point.title = (u'新定位點'+ str( point_id))
         point.x = int(x)
         point.y = int(y)
         point.description = "no description"
