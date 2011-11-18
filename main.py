@@ -60,6 +60,8 @@ class BaseRequestHandler(webapp.RequestHandler):
     # after log in
     logout_url = users.create_logout_url(self.request.uri)
     
+    map_results = Map.all().filter('author =', user).order('-date').fetch(1000)
+    user_maps = [ (map.map_id, map.title) for map in map_results]
     map = Map.all().filter('author =', user).order('-date').get()
     point_results = []
     point_data = []
@@ -78,6 +80,7 @@ class BaseRequestHandler(webapp.RequestHandler):
         'user' : user,
         'logout_url': logout_url,
         'map': map,
+        'user_maps' : simplejson.dumps(user_maps),
         'point_data': simplejson.dumps(point_data),
         'point_titles': simplejson.dumps(point_titles),
         'point_descriptions': simplejson.dumps(point_descriptions),
@@ -109,7 +112,7 @@ class UploadMap(BaseRequestHandler):
             map.map_id = largest_map.map_id + 1
             
         map.map_ver = 1
-        map.title = ''
+        map.title = u'新地圖'+ str(map.map_id)
         img = self.request.get("img")
         map.file = db.Blob(str(img))
         if (images.Image(image_data=map.file).width < 700) or (images.Image(image_data=map.file).height < 400):
@@ -122,12 +125,14 @@ class UploadMap(BaseRequestHandler):
             self.response.out.write(simplejson.dumps(template_values))
         else:
             map.put()
-            seed = user
+            map_results = Map.all().filter('author =', user).order('-date').fetch(1000)
+            user_maps = [ (map.map_id, map.title) for map in map_results]
             map = Map.all().filter('author =', user).order('-date').get()
             template_values = {
                 'success': "true",
                 'message': "successful upload map",
                 'map_key': str(map.key()),
+                'user_maps' : user_maps,
             }
             self.response.clear()
             self.response.out.write(simplejson.dumps(template_values))
@@ -185,7 +190,7 @@ class PointPhotoImage(webapp.RequestHandler):
 class DropMap(BaseRequestHandler):
     def post(self):
         map = db.get(self.request.get("key"))
-        
+        user = users.get_current_user()
         #delete all points related to this map
         query = Point.all()
         query.filter('map_id =', map.map_id)
@@ -198,10 +203,13 @@ class DropMap(BaseRequestHandler):
         
         #delete this map
         db.delete(map)
+        map_results = Map.all().filter('author =', user).order('-date').fetch(1000)
+        user_maps = [ (map.map_id, map.title) for map in map_results]
         template_values = {
             'map': None,
+            'user_maps' : user_maps,
         }
-        self.response.out.write( self.generate('index.html',template_values))
+        self.response.out.write( simplejson.dumps(template_values))
 
         
 class UpdateMap(webapp.RequestHandler):

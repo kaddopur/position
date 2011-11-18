@@ -16,6 +16,12 @@ indexes:
   - name: date
     direction: desc
 
+- kind: Map
+  properties:
+  - name: author=
+  - name: date
+    direction: desc
+
 - kind: Point
   properties:
   - name: map_id
