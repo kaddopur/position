@@ -14,6 +14,11 @@ indexes:
   properties:
   - name: author
   - name: date
+
+- kind: Map
+  properties:
+  - name: author
+  - name: date
     direction: desc
 
 - kind: Map

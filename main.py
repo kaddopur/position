@@ -60,8 +60,8 @@ class BaseRequestHandler(webapp.RequestHandler):
     # after log in
     logout_url = users.create_logout_url(self.request.uri)
     
-    map_results = Map.all().filter('author =', user).order('-date').fetch(1000)
-    user_maps = [ (map.map_id, map.title) for map in map_results]
+    map_results = Map.all().filter('author =', user).order('date').fetch(1000)
+    user_maps = [ (str(map.key()), map.title) for map in map_results]
     map = Map.all().filter('author =', user).order('-date').get()
     point_results = []
     point_data = []
@@ -101,7 +101,7 @@ class MainPage(BaseRequestHandler):
         
         self.response.out.write( self.generate('index.html',{}))
         
-class UploadMap(BaseRequestHandler):
+class UploadMap(webapp.RequestHandler):
     def post(self):
         user = users.get_current_user()
      
@@ -112,7 +112,7 @@ class UploadMap(BaseRequestHandler):
             map.map_id = largest_map.map_id + 1
             
         map.map_ver = 1
-        map.title = u'新地圖'+ str(map.map_id)
+        map.title = u'地圖'+ str(map.map_id)
         img = self.request.get("img")
         map.file = db.Blob(str(img))
         if (images.Image(image_data=map.file).width < 700) or (images.Image(image_data=map.file).height < 400):
@@ -125,19 +125,20 @@ class UploadMap(BaseRequestHandler):
             self.response.out.write(simplejson.dumps(template_values))
         else:
             map.put()
-            map_results = Map.all().filter('author =', user).order('-date').fetch(1000)
-            user_maps = [ (map.map_id, map.title) for map in map_results]
+            map_results = Map.all().filter('author =', user).order('date').fetch(1000)
+            user_maps = [ (str(map.key()), map.title) for map in map_results]
             map = Map.all().filter('author =', user).order('-date').get()
             template_values = {
                 'success': "true",
                 'message': "successful upload map",
                 'map_key': str(map.key()),
+                'map_title': map.title,
                 'user_maps' : user_maps,
             }
             self.response.clear()
             self.response.out.write(simplejson.dumps(template_values))
 
-class UploadPhoto(BaseRequestHandler):
+class UploadPhoto(webapp.RequestHandler):
     def post(self):
         user = users.get_current_user()
         map = db.get(self.request.get("map_key"))
@@ -203,8 +204,8 @@ class DropMap(BaseRequestHandler):
         
         #delete this map
         db.delete(map)
-        map_results = Map.all().filter('author =', user).order('-date').fetch(1000)
-        user_maps = [ (map.map_id, map.title) for map in map_results]
+        map_results = Map.all().filter('author =', user).order('date').fetch(1000)
+        user_maps = [ (str(map.key()), map.title) for map in map_results]
         template_values = {
             'map': None,
             'user_maps' : user_maps,
@@ -311,7 +312,7 @@ class RPCHandler(webapp.RequestHandler):
             func = getattr(self.methods, action, None)
    
     if not func:
-        self.error(404) # file not found
+        self.error(405) # file not found
         return
         
     args = ()
@@ -332,24 +333,27 @@ class RPCMethods:
     NOTE: Do not allow remote callers access to private/protected "_*" methods.
     """
     #private method __template
-    def __template(self, values):
+    def __template(self, values, map_key):
         # prepare return data
         user = users.get_current_user()
         if not user:
             self.error(404)
-        map = Map.all().filter('author =', user).order('-date').get()
+        map = db.get(map_key)
         point_results = []
         point_data = []
         point_titles = []
         point_descriptions = []
         point_photos = []
+        map_title = ""
         if map:
+            map_title = map.title
             point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
             if point_results:
                 point_data = [(point.x, point.y, point.point_id) for point in point_results]
                 point_titles = [(point.title) for point in point_results]
                 point_descriptions = [(point.description) for point in point_results]
                 point_photos = [(point.photo_key) for point in point_results]
+                
             
         template_values = {
             'point_id': 0,
@@ -357,10 +361,14 @@ class RPCMethods:
             'point_titles': point_titles,
             'point_descriptions': point_descriptions,
             'point_photos': point_photos,
+            'map_title': map_title,
         }
         template_values.update(values)
         return template_values
+    
+
         
+    
     def addPointAjax(self, *args):
         
         #add new point into database
@@ -381,7 +389,7 @@ class RPCMethods:
         if largest_point:
             point_id = largest_point.point_id + 1
             point.point_id = largest_point.point_id + 1
-        point.title = (u'新定位點'+ str( point_id))
+        point.title = (u'定位點'+ str( point_id))
         point.x = int(x)
         point.y = int(y)
         point.description = "no description"
@@ -392,8 +400,15 @@ class RPCMethods:
             'point_id': point_id,
         }
         
-        return self.__template( values)
-        
+        return self.__template( values, mapkey)
+    
+    def changeMapAjax(self, *args):
+        mapkey = args[0]
+        values = {
+            'map_key': mapkey,
+        }
+        return self.__template( values, mapkey)
+    
     def updatePointAjax(self, *args):
         mapkey = args[0]
         point_id = args[1]
@@ -415,7 +430,7 @@ class RPCMethods:
             'point_id': point_id,
         }
         
-        return self.__template( values)
+        return self.__template( values, mapkey)
         
     def deletePointAjax(self, *args):
         mapkey = args[0]
@@ -432,7 +447,7 @@ class RPCMethods:
             'point_id': 0,
         }
         
-        return self.__template( values)
+        return self.__template( values, mapkey)
      
   
     

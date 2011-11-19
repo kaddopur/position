@@ -3,15 +3,15 @@
         <title>Indoor Positioning</title>
         <link type="text/css" rel="stylesheet" href="/style/bootstrap-1.1.0.css">
         <link type="text/css" rel="stylesheet" href="/style/docs.css">
-        <link href="/style/fileuploader.css" rel="stylesheet" type="text/css">	
+        <link href="/style/fileuploader.css" rel="stylesheet" type="text/css">    
         <script src="/script/shiftzoom.js"></script>
         
         <style type="text/css">
-			.round {
-				border-radius: 5px;
+            .round {
+                border-radius: 5px;
                 box-shadow: 0 2px 6px rgba(1,1,1,0.5);
                 padding: 20px 20px 0;
-			}
+            }
         </style>
         
         <script type="text/javascript" src="/script/jquery-1.3.2.js"></script> 
@@ -57,22 +57,38 @@
             /*
              * update map_list
              */
-            function updateMapList(){
+            function updateMapList( map_list){
+                if( map_list == null)
+                    map_list = _user_maps;
+                else
+                    _user_maps = map_list;
                 var mapList = document.getElementById('mapList');
-                
                 if ( mapList.hasChildNodes()){
                     while ( mapList.childNodes.length >= 1 )
                     {
-                        mapList.removeChild( mapList.lastChild );       
+                        mapList.removeChild( mapList.lastChild );
                     } 
                 }
                 for( var i in _user_maps){
                     var li = document.createElement('li');
                     li.innerHTML = '<a href="#">'+_user_maps[i][1]+'</a>';
                     mapList.appendChild(li);
+                    //li.onclick = function(){};
+                    li.setAttribute("onclick", "javascript:doChangeMapAjax( '"+_user_maps[i][0]+ "');");
                 }
+                var divider = document.createElement('li');
+                divider.setAttribute("class" , "divider");
+                mapList.appendChild(divider);
                 
-            }           
+                var createNewMap = document.createElement('li');
+                createNewMap.innerHTML = '<a href="#"><font color="ORANGE">新增地圖</font></a>';
+                mapList.appendChild(createNewMap);
+                createNewMap.setAttribute("onclick", "javascript:clearMapArea();");
+                
+            }
+            
+            
+            
             
             /*
              *  set dropupload
@@ -144,18 +160,18 @@
             function setIndex(index){
                 //if (index < 0) return;
                 var Points = _Points;
-				var title_list = _title_list;
-				var desc_list = _desc_list;
+                var title_list = _title_list;
+                var desc_list = _desc_list;
                 var photo_list = _photo_list;
                 reloadElement( index, Points, title_list, desc_list, photo_list);
-			}
+            }
 
             function reloadElement(index,Points, title_list, desc_list, photo_list){
                 
-                var img = document.getElementById("curMap");	
-				var title = document.getElementById('point_title');
-				var desc = document.getElementById('point_description');
-				var id = document.getElementById('point_id');
+                var img = document.getElementById("curMap");    
+                var title = document.getElementById('point_title');
+                var desc = document.getElementById('point_description');
+                var id = document.getElementById('point_id');
                 if ( _debug)
                     alert(index+" / "+ Points.length);
 
@@ -174,9 +190,9 @@
                     desc.value = '';
                     updatePhoto();
                 }
-				
+                
                 title.focus();
-				shiftzoom.destruct(img, true);
+                shiftzoom.destruct(img, true);
                 var navTable = document.getElementById('navTable');
                 while ( navTable.rows.length > 0 ){
                     navTable.deleteRow(0);
@@ -191,38 +207,38 @@
                     var cell = row.insertCell(-1); //td
                     cell.innerHTML = title_list[i];
                     var cellButton = row.insertCell(-1);
-                    cellButton.innerHTML = '<input type="image" src="image/icons/delete_button.png" alt="Delete" width="20" height="20" align="RIGHT" onclick="event.cancelBubble=true;doDeletePointAjax();" >';
-					if (i != index){
-						shiftzoom.construct( img, [{id: Points[i][2],
-							                        x: Points[i][0], 
-							                        y: Points[i][1],
-													w: 25, 
-													h: 45,
-													pos: 8,
-													title: title_list[i], 
-													href: 'javascript:setIndex('+i+')', 
-													src: 'image/icons/marker_pink.png', 
-													src2: 'image/icons/marker_pink_hover.png'}]);
-						document.getElementById("nav_" + Points[i][2]).style.backgroundColor="#fafafa";
-					} else {
-						shiftzoom.construct( img,[{id: Points[index][2],
-					                       x: Points[index][0], 
-										   y: Points[index][1], 
-										   w: 25, 
-										   h: 45,
-										   pos: 8,
-										   title: title_list[index],
-										   src: 'image/icons/marker_blue.png', 
-										   src2: 'image/icons/marker_blue_hover.png'}]);
-						document.getElementById("nav_" + Points[index][2]).style.backgroundColor="#C2FFFD";
-					}
-				}
+                    cellButton.innerHTML = '<input type="image" src="image/icons/delete_button.png" alt="Delete" width="20" height="20" align="RIGHT" onclick="event.cancelBubble=true;doDeletePointAjax('+Points[i][2]+');" >';
+                    if (i != index){
+                        shiftzoom.construct( img, [{id: Points[i][2],
+                                                    x: Points[i][0], 
+                                                    y: Points[i][1],
+                                                    w: 25, 
+                                                    h: 45,
+                                                    pos: 8,
+                                                    title: title_list[i], 
+                                                    href: 'javascript:setIndex('+i+')', 
+                                                    src: 'image/icons/marker_pink.png', 
+                                                    src2: 'image/icons/marker_pink_hover.png'}]);
+                        document.getElementById("nav_" + Points[i][2]).style.backgroundColor="#fafafa";
+                    } else {
+                        shiftzoom.construct( img,[{id: Points[index][2],
+                                           x: Points[index][0], 
+                                           y: Points[index][1], 
+                                           w: 25, 
+                                           h: 45,
+                                           pos: 8,
+                                           title: title_list[index],
+                                           src: 'image/icons/marker_blue.png', 
+                                           src2: 'image/icons/marker_blue_hover.png'}]);
+                        document.getElementById("nav_" + Points[index][2]).style.backgroundColor="#C2FFFD";
+                    }
+                }
                 var imgWidth=shiftzoom.get(img,'maxwidth');
                 var imgHeight=shiftzoom.get(img,'maxheight');
-				if( !(index < 0)){
+                if( !(index < 0)){
                     shiftzoom.kenburns(img, [100.0*Points[index][0]/imgWidth, 100.0*Points[index][1]/imgHeight, 100, 3]);
                 }
-			}
+            }
 
             
 
@@ -230,15 +246,15 @@
              *  set timer to detect mouse event
              */
             var timer;
-			
+            
             function setTimer(e){
                 timer=setTimeout(function(){doAddPointAjax(e);},500);    
-			}
+            }
             
             
             function clearTimer(){
                 clearTimeout(timer);
-			}
+            }
             
             
             
@@ -249,15 +265,8 @@
              *  do ajax with JQuery ajax
              */
             function deleteMapAjax(){
-				if( _map_key.length){
+                if( _map_key.length){
                     if (confirm("確定要刪除此地圖及所有定位點？")){
-                        var xlInput = document.getElementById('xlInput');
-                        xlInput.value = "";
-                        var qr_all = document.getElementById('qr_all');
-                        qr_all.href = "";
-                        var body = document.getElementById('mapArea');
-                        mapArea.innerHTML = '<form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post"><div><input id="mapUpload" type="file" name="img"/></div><div><input id="submitButton" type="button" onclick="uploadMap();" value="上傳地圖"></div></form>';
-                        //body.innerHTML = 
                         var responseText = $.ajax({
                               url: "/drop_map",
                               global: true,
@@ -272,18 +281,15 @@
                            }
                         ).responseText;
                         var result = JSON.parse( responseText);
-                        _map_key = '';
-                        _Points = [];
-                        _title_list = [];
-                        _desc_list = [];
-                        _photo_list = [];
-                        _user_maps = result.user_maps;
-                        alert(_user_maps);
-                        updateMapList();
-                        setIndex(-1);
+                        updateMapList(result.user_maps);
+                        if( result.user_maps.length == 0 )
+                            clearMapArea();
+                        else
+                            doChangeMapAjax( _user_maps[result.user_maps.length-1][0]);
                     }
                 }
-			}
+            }
+            
             
             function saveMapAjax(){
                 if( _map_key.length){
@@ -338,51 +344,17 @@
                     alert( response.message);
                 }
                 else{
-                    _map_key = response.map_key;
                     _Points = [];
                     _title_list = [];
                     _desc_list = [];
                     _photo_list = [];
-                    _user_maps = response.user_maps;
-                    
-                    updateMapList();
-                    
-                    var mapArea = document.getElementById('mapArea');
-                    
-                    var qr_all = document.getElementById('qr_all');
-                    qr_all.href = "/qr_all?key="+_map_key;
-                    
-                    while ( mapArea.childNodes.length > 0){
-                        mapArea.removeChild( mapArea.lastChild);
-                    }
-                    var divTag = document.createElement("div");
-                    var imgTag = document.createElement("img");
-                    
-                    divTag.id = "back";
-                    divTag.onmouseup = function(){ clearTimer();};
-                    divTag.onmousedown = function(e){ setTimer(e);};
-                    
-                    imgTag.id = "curMap";
-                    imgTag.alt = "地圖";
-                    imgTag.src = "/map_image?key=" + _map_key;
-                    imgTag.onload = function(){                        
-                        shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});
-                        setIndex(findIndex());
-                    };          
-                    imgTag.style.width = "100%";
-                    imgTag.style.height = "100%";
-                    
-                    divTag = mapArea.appendChild( divTag);
-                    imgTag = divTag.appendChild( imgTag);
-                    
-                    document.getElementById('map_profile').key.value = _map_key;
-                    document.getElementById('update_map').onclick = function(){saveMapAjax();};
-                    document.getElementById('delete_map').onclick = function(){deleteMapAjax();};
-                    document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
-                    document.getElementById('update_point').onclick = function(){doUpdatePointAjax();};
-                    document.getElementById('delete_point').onclick = function(){doDeletePointAjax();};
+                    updateMapList(response.user_maps);
+                    setupMapArea( response);
                 }
             }
+            
+            
+            /*
             function getStyle(el,styleProp)
             {
                 var x = document.getElementById(el);
@@ -391,12 +363,13 @@
                 else if (window.getComputedStyle) // FF & Opera model
                     var y = document.defaultView.getComputedStyle(x,null).getPropertyValue(styleProp);
                 return y;
-            }
+            }*/
 
             /*
              *  ajax based on XMLHttpRequest implemented ourself
              */
             var server = {};
+            InstallFunction(server, 'changeMapAjax');
             InstallFunction(server, 'addPointAjax');
             InstallFunction(server, 'deletePointAjax');
             InstallFunction(server, 'updatePointAjax');
@@ -411,8 +384,8 @@
                 
                 // refresh data in js
                 _Points = response.point_data;
-				_title_list = response.point_titles;
-				_desc_list = response.point_descriptions;
+                _title_list = response.point_titles;
+                _desc_list = response.point_descriptions;
                 _photo_list = response.point_photos;
                 _point_id = response.point_id;
                 // sync the Map with databse
@@ -420,6 +393,14 @@
                 reloadElement(index, response.point_data, response.point_titles, response.point_descriptions, response.point_photos);
             }
             
+            function onChangeMapSuccess(response){
+                setupMapArea(response);
+                refreshMap(response);
+            }
+            
+            function doChangeMapAjax(map_key){
+                server.changeMapAjax( map_key,  onChangeMapSuccess);
+            }
             
             function onUpdateSuccess(response){
                 refreshMap(response);
@@ -429,8 +410,8 @@
                 if ( _Points.length <=0)
                     return;
                 var title = document.getElementById('point_title');
-				var desc = document.getElementById('point_description');
-				var id = document.getElementById('point_id');
+                var desc = document.getElementById('point_description');
+                var id = document.getElementById('point_id');
                 var photo_key =  document.getElementById('photo_key');
                 var photo_key_value = null;
                 if( photo_key !== null)
@@ -443,14 +424,15 @@
                 refreshMap(response);
             }
             
-            function doDeletePointAjax(){
+            function doDeletePointAjax(id){
                 if ( _Points.length <=0)
                     return;
                 var title = document.getElementById('point_title');
-				var id = document.getElementById('point_id');
+                if( id ==null)
+                    id = document.getElementById('point_id').value;
                 if (confirm("確定要刪除此定位點【" + title.value + "】？")){
-                    server.deletePointAjax(_map_key, id.value, onDeleteSuccess);
-				}
+                    server.deletePointAjax(_map_key, id, onDeleteSuccess);
+                }
             }
             
             function onAddSuccess(response) {
@@ -463,7 +445,7 @@
                 if( Math.abs( eNow.pageX - e.pageX) > 5 || Math.abs( eNow.pageY - e.pageY) > 5){
                     return;
                 }
-				var img=document.getElementById("curMap");
+                var img=document.getElementById("curMap");
                 var back=document.getElementById("back");
                 var p=shiftzoom.get(img,'currentxyz');
                 backX=e.pageX-back.offsetLeft;
@@ -543,36 +525,36 @@
                 icon.src = icon.first;
             }
 
-			function getQRSingle(){
+            function getQRSingle(){
                 if ( _Points.length <=0 || _point_id <=0)
                     return;
-				var id = document.getElementById('point_id');
-				var targetURL = '/qr_single?key='+_map_key+'&pointID=' + id.value;
+                var id = document.getElementById('point_id');
+                var targetURL = '/qr_single?key='+_map_key+'&pointID=' + id.value;
 
-				window.open(targetURL, '', 'height=240, width=240');
-			}
+                window.open(targetURL, '', 'height=240, width=240');
+            }
             
             function findIndex(){
-				var Points = _Points;
-				var url = window.location.toString();
+                var Points = _Points;
+                var url = window.location.toString();
                 
-				if(url.indexOf("?") != -1){ //url裡有"?"符號
- 					var ary = url.split("?")[1].split("&");
-					for(var i in ary){
-						if(ary[i].split("=")[0] == "pointID"){
-							for(var j in Points){
-								if(Points[j][2] == (ary[i].split("=")[1])){
-									return j
-								}
-							}
-						}
-					}
-				} else if (Points.length>0){
-					return 0;
-				} else 
+                if(url.indexOf("?") != -1){ //url裡有"?"符號
+                     var ary = url.split("?")[1].split("&");
+                    for(var i in ary){
+                        if(ary[i].split("=")[0] == "pointID"){
+                            for(var j in Points){
+                                if(Points[j][2] == (ary[i].split("=")[1])){
+                                    return j
+                                }
+                            }
+                        }
+                    }
+                } else if (Points.length>0){
+                    return 0;
+                } else 
                     //empty Points 
                     return -1;
-			}
+            }
             
             function findIndexOf( point_id , list){
 
@@ -582,23 +564,79 @@
                     }
                 }
                 return -1;
-			}
+            }
             
-			function findID(){
-				var Points = _Points;
-				var url = window.location.toString();
+            function findID(){
+                var Points = _Points;
+                var url = window.location.toString();
 
-				if(url.indexOf("?") != -1){ //url裡有"?"符號
- 					var ary = url.split("?")[1].split("&");
-					for(var i in ary){
-						if(ary[i].split("=")[0] == "pointID"){
-							return ary[i].split("=")[1];
-						}
-					}
-				}
-			}
+                if(url.indexOf("?") != -1){ //url裡有"?"符號
+                     var ary = url.split("?")[1].split("&");
+                    for(var i in ary){
+                        if(ary[i].split("=")[0] == "pointID"){
+                            return ary[i].split("=")[1];
+                        }
+                    }
+                }
+            }
             
-
+            function clearMapArea(){
+                var xlInput = document.getElementById('xlInput');
+                xlInput.value = "";
+                var qr_all = document.getElementById('qr_all');
+                qr_all.href = "";
+                var body = document.getElementById('mapArea');
+                mapArea.innerHTML = '<form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post"><div><input id="mapUpload" type="file" name="img"/></div><div><input id="submitButton" type="button" onclick="uploadMap();" value="上傳地圖"></div></form>';
+                _map_key = '';
+                _Points = [];
+                _title_list = [];
+                _desc_list = [];
+                _photo_list = [];
+                setIndex(-1);
+            }
+            
+            function setupMapArea(response){
+                var map_key = response.map_key;
+                _map_key = map_key;
+                
+                var map_title = response.map_title;
+                var xlInput = document.getElementById('xlInput');
+                xlInput.value = map_title;
+                
+                var mapArea = document.getElementById('mapArea');
+                
+                var qr_all = document.getElementById('qr_all');
+                qr_all.href = "/qr_all?key="+map_key;
+                
+                while ( mapArea.childNodes.length > 0){
+                    mapArea.removeChild( mapArea.lastChild);
+                }
+                var divTag = document.createElement("div");
+                var imgTag = document.createElement("img");
+                divTag.id = "back";
+                divTag.onmouseup = function(){ clearTimer();};
+                divTag.onmousedown = function(e){ setTimer(e);};
+                
+                imgTag.id = "curMap";
+                imgTag.alt = "地圖";
+                imgTag.src = "/map_image?key=" + map_key;
+                imgTag.onload = function(){                        
+                    shiftzoom.add(this, {showcoords:true,relativecoords:true,zoom:100});
+                    setIndex(findIndex());
+                };
+                imgTag.style.width = "100%";
+                imgTag.style.height = "100%";                
+                divTag = mapArea.appendChild( divTag);
+                imgTag = divTag.appendChild( imgTag);
+                document.getElementById('map_profile').key.value = map_key;
+                document.getElementById('update_map').onclick = function(){saveMapAjax();};
+                document.getElementById('delete_map').onclick = function(){deleteMapAjax();};
+                document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
+                document.getElementById('update_point').onclick = function(){doUpdatePointAjax();};
+                document.getElementById('delete_point').onclick = function(){doDeletePointAjax();};
+                
+            }
+            
                             
         </script>
     </head>
@@ -633,7 +671,7 @@
                     </ul>
                 </div> 
             </div>
-		</div> 
+        </div> 
 
         <div class="container" style="padding-top: 40px;">
             <div class="row show-grid">
@@ -676,7 +714,7 @@
                     <table id="navTable" class="common-table zebra-striped">
                         <!--
                         {% for point in points%}
-						<tr><td onClick="setIndex({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}"><img src="image/icons/delete_button.png" alt="Delete" width="30" height="30" align="RIGHT" />{{point.title}}</td>
+                        <tr><td onClick="setIndex({{forloop.counter0}});" onMouseMove="setIcon({{ forloop.counter0 }});" onMouseOut="unsetIcon({{ forloop.counter0 }});" id="nav_{{point.point_id}}"><img src="image/icons/delete_button.png" alt="Delete" width="30" height="30" align="RIGHT" />{{point.title}}</td>
                             
                         </tr>
                         {% endfor %}
@@ -689,24 +727,24 @@
                 <div class="span16 column">
                     <div style="float: left; width: 30%; height: 150px;">
                         <div class="input" style="margin-bottom: 25px;"> 
-							<input class="xlarge" placeholder="地點名稱" id="point_title" name="xlInput" size="35" type="text" onmouseup=this.select() />
-							
+                            <input class="xlarge" placeholder="地點名稱" id="point_title" name="xlInput" size="35" type="text" onmouseup=this.select() />
+                            
                         </div>
 
-						<p><div class="btn" id="get_qr_single">產生條碼</div></p>
-						<div class="btn primary" id="update_point">儲存定位點</div>
-						<div class="btn danger" id="delete_point">刪除定位點</div>
+                        <p><div class="btn" id="get_qr_single">產生條碼</div></p>
+                        <div class="btn primary" id="update_point">儲存定位點</div>
+                        <div class="btn danger" id="delete_point">刪除定位點</div>
                         <input type="hidden" id="point_id">
-						{% if map %}
-							<script>
+                        {% if map %}
+                            <script>
                                 //data = _Points;
-								//if(data.length > 0){
-									document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
-									document.getElementById('update_point').onclick = function(){doUpdatePointAjax();};
-									document.getElementById('delete_point').onclick = function(){doDeletePointAjax();};
-								//}
-							</script>
-						{% endif %}
+                                //if(data.length > 0){
+                                    document.getElementById('get_qr_single').onclick = function(){getQRSingle();};
+                                    document.getElementById('update_point').onclick = function(){doUpdatePointAjax();};
+                                    document.getElementById('delete_point').onclick = function(){doDeletePointAjax();};
+                                //}
+                            </script>
+                        {% endif %}
 
 
                     </div>
@@ -716,9 +754,9 @@
                             <textarea class="xxlarge" id="point_description" name="textarea" style="width: 100%; height: 80%" onmouseup=this.select()></textarea> 
                             <span class="help-block"> 
                                 請輸入此地點的詳細描述
-						
-							</span>
-						</div> 
+                        
+                            </span>
+                        </div> 
                     </div>
                     
                     <div id="temp" style="float: right; width: 240px; height: 119px;">
@@ -732,7 +770,7 @@
                         </div> 
                     </div>
                 </div> 
-			</div> <!-- /row -->
-		</div>
-	</body>
+            </div> <!-- /row -->
+        </div>
+    </body>
 </html>
