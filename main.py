@@ -210,15 +210,24 @@ class DropMap(BaseRequestHandler):
             'map': None,
             'user_maps' : user_maps,
         }
+        self.response.clear()
         self.response.out.write( simplejson.dumps(template_values))
 
         
 class UpdateMap(webapp.RequestHandler):
     def get(self):
+        user = users.get_current_user()
         map = db.get(self.request.get("key"))
         map.title = self.request.get("title")
         map.map_ver = map.map_ver + 1
         map.put()
+        map_results = Map.all().filter('author =', user).order('date').fetch(1000)
+        user_maps = [ (str(map.key()), map.title) for map in map_results]
+        template_values = {
+            'user_maps' : user_maps,
+        }
+        self.response.clear()
+        self.response.out.write( simplejson.dumps(template_values))
 
         
         
