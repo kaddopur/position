@@ -388,6 +388,7 @@
             }
             
             function refreshMap(response){
+				
                 index = findIndexOf(response.point_id,response.point_data);
                 
                 // refresh data in js
@@ -444,7 +445,7 @@
                 var title = document.getElementById('point_title');
                 if( id ==null)
                     id = document.getElementById('point_id').value;
-                if (confirm("確定要刪除此定位點【" + title.value + "】？")){
+                if (confirm("確定要刪除此定位點【" + _title_list[findIndexOf(id,_Points)] + "】？")){
                     server.deletePointAjax(_map_key, id, onDeleteSuccess);
                 }
             }
