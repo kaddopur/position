@@ -99,8 +99,6 @@
              */
             
             function setDropUpload(){
-                var point_id = _point_id;
-                var map_key = _map_key;
                 
                 $('#fileupload').fileupload({
                     dataType: 'text',
@@ -124,7 +122,7 @@
                     drop: function (e, data) {
                             if( _debug)
                                 alert('Dropped file: ' + file.name);
-                            data.formData = {point_id: point_id, map_key: map_key};
+                            data.formData = {point_id: _point_id, map_key: _map_key};
                     }                    
                 });
             }
