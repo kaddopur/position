@@ -141,7 +141,8 @@
                     imgTag.id = "point_photo";
                     imgTag.src = "/point_photo?key="+photo_key;
                     imgTag.style.width = "100%";
-                    imgTag.style.height = "100%";
+                    //imgTag.style.height = "100%";
+                    
                     
                     var inputTag = document.createElement("input");
                     inputTag.id = "photo_key";
@@ -787,7 +788,7 @@
                     </div>
                     
                     <div id="temp" style="float: right; width: 240px; height: 119px;">
-                        <div  name="drag_upload" id="drag_upload" class="input" style="border: 1px #aaa dotted; margin: 0 40px 40px 0; padding: 50px 0; text-align: center;">
+                        <div  name="drag_upload" id="drag_upload" class="input" style="border: 1px #aaa dotted; margin: 0 40px 40px 0; padding: 50px 0; text-align: center; max-width: 240px; max-height: 119px; overflow: scroll;">
                             <input id="fileupload" type="hidden" type="file" name="files[]" multiple>
                             <script>
                             
