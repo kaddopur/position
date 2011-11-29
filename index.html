@@ -309,6 +309,7 @@
                             if( _debug)
                                 alert(map_profile.action);
                             response = JSON.parse(response);
+							$('#mapVer').html("地圖版本: "+response.map_ver);
                             updateMapList(response.user_maps);
                         }
                     });

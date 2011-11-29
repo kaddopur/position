@@ -229,6 +229,7 @@ class UpdateMap(webapp.RequestHandler):
         user_maps = [ (str(map.key()), map.title) for map in map_results]
         template_values = {
             'user_maps' : user_maps,
+            'map_ver' : map.map_ver,
         }
         self.response.clear()
         self.response.out.write( simplejson.dumps(template_values))
