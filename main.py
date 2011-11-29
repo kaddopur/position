@@ -147,11 +147,11 @@ class UploadPhoto(webapp.RequestHandler):
         query = PointPhoto.all()
         query.filter('map_id =', map.map_id).filter('point_id =', point_id)
         db.delete(query)
-                
+        
         photo = PointPhoto()
         photo.map_id = map.map_id
         photo.point_id = int(self.request.get('point_id'))
-        img = self.request.get('files[]')
+        img = images.resize(self.request.get('files[]'), 240, 120)
         photo.file = db.Blob(str(img))
         photo.title = self.request.get("point_id")
         photo.put()
