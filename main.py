@@ -68,7 +68,9 @@ class BaseRequestHandler(webapp.RequestHandler):
     point_titles = []
     point_descriptions = []
     point_photos = []
+    map_ver = ""
     if map:
+        map_ver = map.map_ver
         point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
         if point_results:
             point_data = [(point.x, point.y, point.point_id) for point in point_results]
@@ -80,6 +82,7 @@ class BaseRequestHandler(webapp.RequestHandler):
         'user' : user,
         'logout_url': logout_url,
         'map': map,
+		'map_ver' : map_ver,
         'user_maps' : simplejson.dumps(user_maps),
         'point_data': simplejson.dumps(point_data),
         'point_titles': simplejson.dumps(point_titles),
@@ -132,6 +135,7 @@ class UploadMap(webapp.RequestHandler):
                 'success': "true",
                 'message': "successful upload map",
                 'map_key': str(map.key()),
+				'map_ver': map.map_ver,
                 'map_title': map.title,
                 'user_maps' : user_maps,
             }
@@ -357,8 +361,10 @@ class RPCMethods:
         point_descriptions = []
         point_photos = []
         map_title = ""
+        map_ver = ""
         if map:
             map_title = map.title
+            map_ver = map.map_ver
             point_results = Point.all().filter('map_id =', map.map_id).order('title').fetch(1000)
             if point_results:
                 point_data = [(point.x, point.y, point.point_id) for point in point_results]
@@ -374,6 +380,7 @@ class RPCMethods:
             'point_descriptions': point_descriptions,
             'point_photos': point_photos,
             'map_title': map_title,
+			'map_ver': map_ver,
         }
         template_values.update(values)
         return template_values

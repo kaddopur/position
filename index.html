@@ -390,7 +390,7 @@
             function refreshMap(response){
 				
                 index = findIndexOf(response.point_id,response.point_data);
-                
+                $('#mapVer').html( "地圖版本: " + response.map_ver);
                 // refresh data in js
                 _Points = response.point_data;
                 _title_list = response.point_titles;
@@ -530,6 +530,7 @@
             
             function setIcon(index){
                 var point_list = _Points;
+				
                 var icon = document.getElementById( point_list[index][2]).firstChild;
                 icon.src = icon.secnd;
             }
@@ -600,6 +601,7 @@
                 xlInput.value = "";
                 var qr_all = document.getElementById('qr_all');
                 qr_all.href = "";
+				$('#mapVer').html("");
                 var body = document.getElementById('mapArea');
                 mapArea.innerHTML = '<form id="mapForm" action="/upload_map" enctype="multipart/form-data" method="post"><div><input id="mapUpload" type="file" name="img"/></div><div><input id="submitButton" type="button" onclick="uploadMap();" value="上傳地圖"></div></form>';
                 _map_key = '';
@@ -617,7 +619,8 @@
                 var map_title = response.map_title;
                 var xlInput = document.getElementById('xlInput');
                 xlInput.value = map_title;
-                
+                $('#mapVer').html("地圖版本: "+response.map_ver);
+				
                 var mapArea = document.getElementById('mapArea');
                 
                 var qr_all = document.getElementById('qr_all');
@@ -691,11 +694,16 @@
         <div class="container" style="padding-top: 40px;">
             <div class="row show-grid">
                 <form id="map_profile" action="/update_map" enctype="multipart/form-data" method="get">
-                    <div class="span12 column">
+                    <div class="span10 column">
                         <input class="xlarge" id="xlInput" name="title" type="text" value="{{ map.title}}" style="margin: 0; padding: 0; width: 100%; height: 100%;" placeholder="地圖標題" onmouseup=this.select() />
                         <input type="hidden" name="key" value="{{ map.key }}">
                     </div>
+				    
+ 
                     {% if map %}
+						<div id="mapVer" class="span2 column">
+							地圖版本: {{map_ver}}
+						</div>
                         <div class="span2 column">
                             <button class="btn primary" onclick="saveMapAjax();" data-loading-text="儲存中..." id="update_map" style="margin: 0; padding: 0; width: 100%; height: 100%; ">儲存地圖</button>
                             
@@ -704,6 +712,8 @@
                             <input onclick="deleteMapAjax();" type="button" class="btn danger" id="delete_map" value="刪除地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
                     {% else %}
+						<div class="span2 column">
+						</div>
                         <div class="span2 column">
                             <input type="button" class="btn primary" data-loading-text="儲存中..." id="update_map" value="儲存地圖" style="margin: 0; padding: 0; width: 100%; height: 100%; text-align: center;">
                         </div>
