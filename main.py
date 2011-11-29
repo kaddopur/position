@@ -288,11 +288,14 @@ class ShowJson(webapp.RequestHandler):
             point_result = Point.all().filter('map_id =', int(self.request.get('mapID'))).fetch(1000)
             points = []
             for res in point_result:
-                points.append({"pointID": res.point_id,
+				photoUrl = ""
+				if res.photo_key != None:
+					photoUrl = "http://indoorposition.appspot.com/point_photo?key=%s" % res.photo_key
+				points.append({"pointID": res.point_id,
                                "title": res.title,
                                "description": res.description,
                                "coord": {"x": res.x, "y": res.y},
-                               "photo": []})
+                               "photo": photoUrl})
 
             result = {"mapID": map.map_id,
                        "mapVer": map.map_ver,
