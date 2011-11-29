@@ -155,7 +155,7 @@ class UploadPhoto(webapp.RequestHandler):
         photo = PointPhoto()
         photo.map_id = map.map_id
         photo.point_id = int(self.request.get('point_id'))
-        img = images.resize(self.request.get('files[]'), 320)
+        img = images.resize(self.request.get('files[]'), 350)
         photo.file = db.Blob(str(img))
         photo.title = self.request.get("point_id")
         photo.put()
@@ -279,9 +279,9 @@ class ShowJson(webapp.RequestHandler):
 
         if self.request.get('from') != 'client':
             self.response.headers['Content-Type'] = 'text/html'
-            self.response.out.write('<body charset=\'utf-8\'>')
-            self.response.out.write('請使用專用使用者端軟體<p><a href=\'http://dl.dropbox.com/u/871055/posClient.apk\'>下載</a>')
-            self.response.out.write('</body>')
+            self.response.out.write('<html><head><meta charset="utf-8"></head><body>')
+            self.response.out.write('<h1>請使用專用手機端軟體</h1><h3><a href=\'http://dl.dropbox.com/u/871055/posClient.apk\'>下載</a></h3>')
+            self.response.out.write('</body></html>')
             return
 
         query = Map.all()
